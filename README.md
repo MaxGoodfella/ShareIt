@@ -1,2 +1,2 @@
-# java-shareit
-Template repository for Shareit project.
+# Привет, Яков!
+Спасибо за проверку!
