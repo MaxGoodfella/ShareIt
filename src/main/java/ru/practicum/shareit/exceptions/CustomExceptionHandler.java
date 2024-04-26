@@ -14,7 +14,7 @@ import javax.validation.ConstraintViolationException;
 public class CustomExceptionHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ConstraintViolationException.class,
-            IllegalArgumentException.class, UnauthorizedAccessException.class})
+            IllegalArgumentException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(Exception e) {
         log.debug("Получен статус 400 Bad Request {}", e.getMessage(), e);

@@ -18,7 +18,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item add(Integer userId, Item item) {
-
         for (Item existingItem : items.values()) {
             if (existingItem.getName().equalsIgnoreCase(item.getName()) &&
                     existingItem.getDescription().equalsIgnoreCase(item.getDescription())) {
@@ -31,7 +30,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
         items.put(item.getId(), item);
         return item;
-
     }
 
     @Override
@@ -82,7 +80,6 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> search(String text) {
-
         if (text == null || text.isBlank() || text.isEmpty()) {
             return Collections.emptyList();
         }
@@ -99,7 +96,6 @@ public class ItemRepositoryImpl implements ItemRepository {
         }
 
         return matchingItems;
-
     }
 
 

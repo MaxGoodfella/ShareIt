@@ -50,4 +50,7 @@ public class User {
         this.email = email;
     }
 
+    public User(String name) {
+        this.name = name;
+    }
 }
