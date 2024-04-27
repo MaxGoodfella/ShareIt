@@ -23,6 +23,6 @@ public class Booking {
     private User booker;
 
     @NotNull
-    private BOOKING_STATUS status;
+    private BookingStatus status;
 
 }

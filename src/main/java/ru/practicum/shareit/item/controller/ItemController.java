@@ -17,10 +17,12 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
-    private ItemService itemService;
+    private final ItemService itemService;
+
+    private final static String REQUEST_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public Item add(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public Item add(@RequestHeader(REQUEST_HEADER) Integer userId,
                     @Valid @RequestBody ItemDto item) {
         log.info("Start saving item {}", item);
         Item addedItem = itemService.add(userId, item);
@@ -29,7 +31,7 @@ public class ItemController {
     }
 
     @PatchMapping("/{itemId}")
-    public Item update(@RequestHeader("X-Sharer-User-Id") Integer userId,
+    public Item update(@RequestHeader(REQUEST_HEADER) Integer userId,
                        @PathVariable("itemId") Integer itemId,
                        @RequestBody ItemDto itemDto) {
         log.info("Start updating item {}", itemDto);
@@ -47,7 +49,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<Item> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") Integer userId) {
+    public List<Item> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
         log.info("Start fetching items for user with id = {}", userId);
         List<Item> fetchedItems = itemService.getItems(userId);
         log.info("Finish fetching items for user with id = {}", userId);

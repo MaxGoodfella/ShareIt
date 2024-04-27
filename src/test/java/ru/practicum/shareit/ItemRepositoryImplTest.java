@@ -36,7 +36,7 @@ public class ItemRepositoryImplTest {
 
 
     @Test
-    public void testSave() {
+    public void saveValid() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
         Item newItem = new Item("item", "item_description", true);
@@ -45,7 +45,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithNoAvailabilityStatus() {
+    public void saveWithNoAvailabilityStatus_ShouldFailValidation() {
         Item newItem = new Item("item", "item_description");
 
         Set<ConstraintViolation<Item>> violations = validator.validate(newItem);
@@ -53,7 +53,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithNoName() {
+    public void saveWithNoName_ShouldFailValidation() {
         Item newItem = new Item("item_description", true);
 
         Set<ConstraintViolation<Item>> violations = validator.validate(newItem);
@@ -61,7 +61,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithSameNameAndDescription_ShouldThrowEntityAlreadyExistsException() {
+    public void saveWithSameNameAndDescription_ShouldThrowEntityAlreadyExistsException() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
 
@@ -74,7 +74,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testUpdateExistingItem() {
+    public void updateExistingItem() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
 
@@ -93,7 +93,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testUpdateUnknownItem_shouldThrowEntityNotFoundException() {
+    public void updateUnknownItem_shouldThrowEntityNotFoundException() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
 
@@ -107,7 +107,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testGetItems() {
+    public void getItems() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
 
@@ -130,7 +130,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testGetItem() {
+    public void getExistingItem() {
         User user1 = new User("user1", "user1@gmail.com");
         User savedUser1 = userRepository.save(user1);
 
@@ -147,7 +147,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testGetItem_shouldThrowEntityNotFoundException() {
+    public void getNotExistingItem_shouldThrowEntityNotFoundException() {
         Item newItem1 = new Item("item1", "item1_description", false);
         Item newItem2 = new Item("item2", "item2_description", false);
 
@@ -158,7 +158,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testSearch() {
+    public void search() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
         User savedUser1 = userRepository.save(user1);
@@ -186,7 +186,7 @@ public class ItemRepositoryImplTest {
     }
 
     @Test
-    public void testSearchEmptyQuery() {
+    public void searchByEmptyQuery_ShouldReturnEmptyList() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
         User savedUser1 = userRepository.save(user1);

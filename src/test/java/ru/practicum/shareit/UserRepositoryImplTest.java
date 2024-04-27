@@ -30,15 +30,16 @@ public class UserRepositoryImplTest {
         validator = factory.getValidator();
     }
 
+
     @Test
-    public void testSave() {
+    public void saveValid() {
         User newUser = new User("user", "user@gmail.com");
 
         assertDoesNotThrow(() -> userRepository.save(newUser));
     }
 
     @Test
-    public void testSaveWithNoEmail() {
+    public void saveWithNoEmail_ShouldFailValidation() {
         User newUser = new User("user");
 
         Set<ConstraintViolation<User>> violations = validator.validate(newUser);
@@ -46,7 +47,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithInvalidEmail() {
+    public void saveWithInvalidEmail_ShouldFailValidation() {
         User newUser = new User("user", "это-неправильный?эмейл@");
 
         Set<ConstraintViolation<User>> violations = validator.validate(newUser);
@@ -54,7 +55,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithSameEmail_ShouldThrowEntityAlreadyExistsException() {
+    public void saveWithSameEmail_ShouldThrowEntityAlreadyExistsException() {
         User newUser1 = new User("user1", "user@gmail.com");
         User newUser2 = new User("user2", "user@gmail.com");
 
@@ -64,7 +65,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testSaveWithSameName_ShouldThrowEntityAlreadyExistsException() {
+    public void saveWithSameName_ShouldThrowEntityAlreadyExistsException() {
         User newUser1 = new User("user", "user1@gmail.com");
         User newUser2 = new User("user", "user1@gmail.com");
 
@@ -74,7 +75,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testUpdateExistingUser() {
+    public void updateExistingUser() {
         User existingUser = new User("user", "user1@gmail.com");
         userRepository.save(existingUser);
 
@@ -89,7 +90,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testUpdateUnknownUser_shouldThrowEntityNotFoundException() {
+    public void updateUnknownUser_shouldThrowEntityNotFoundException() {
         User existingUser = new User("user1", "user1@gmail.com");
         userRepository.save(existingUser);
 
@@ -100,7 +101,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testFindAll() {
+    public void findAll() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
         userRepository.save(user1);
@@ -128,7 +129,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testFindById() {
+    public void findExistingUserById() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
 
@@ -142,7 +143,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testFindById_shouldThrowEntityNotFoundException() {
+    public void testFindNotExistingUserById_shouldThrowEntityNotFoundException() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
 
@@ -153,7 +154,7 @@ public class UserRepositoryImplTest {
     }
 
     @Test
-    public void testDeleteById() {
+    public void deleteById() {
         User user1 = new User("user1", "user1@gmail.com");
         User user2 = new User("user2", "user2@gmail.com");
 

@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping(path = "/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)

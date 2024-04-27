@@ -22,7 +22,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item add(Integer userId, ItemDto itemDto) {
-
         User user = userRepository.findById(userId);
 
         Item newItem = modelMapper.map(itemDto, Item.class);
