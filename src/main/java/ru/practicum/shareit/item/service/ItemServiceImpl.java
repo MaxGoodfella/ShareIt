@@ -4,74 +4,98 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.AccessDeniedException;
+import ru.practicum.shareit.exceptions.EntityAlreadyExistsException;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.repository.JpaItemRepository;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.repository.JpaUserRepository;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final JpaItemRepository itemRepository;
+    private final JpaUserRepository userRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public Item add(Integer userId, ItemDto itemDto) {
-        User user = userRepository.findById(userId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                        "Пользователь с id " + userId + " не найден."));
 
         Item newItem = modelMapper.map(itemDto, Item.class);
 
+        if (itemRepository.findByNameAndDescription(newItem.getName(), newItem.getDescription()).isPresent()) {
+            throw new EntityAlreadyExistsException(Item.class, "Item с названием '" +
+                    newItem.getName() + "' и описанием '" + newItem.getDescription() + "' уже зарегистрирован.");
+        }
+
         newItem.setOwner(user);
 
-        return itemRepository.add(userId, newItem);
+        return itemRepository.save(newItem);
     }
 
     @Override
     public Item update(Integer userId, Integer itemId, ItemDto itemDto) {
-        User user = userRepository.findById(userId);
-        Item existingItem = itemRepository.getItem(itemId);
+
+        userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                        "Пользователь с id " + userId + " не найден."));
+
+        Item existingItem = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException(Item.class,
+                        "Вещь с id " + itemId + " не найдена."));
 
         if (!existingItem.getOwner().getId().equals(userId)) {
             throw new AccessDeniedException(Integer.class,
                     "Пользователь с id = " + userId +  " не имеет права обновлять эту вещь.");
         }
 
-        Item updatedItem = new Item();
-        updatedItem.setId(itemId);
-
         if (itemDto.getName() != null) {
-            updatedItem.setName(itemDto.getName());
+            existingItem.setName(itemDto.getName());
         }
         if (itemDto.getDescription() != null) {
-            updatedItem.setDescription(itemDto.getDescription());
+            existingItem.setDescription(itemDto.getDescription());
         }
         if (itemDto.getAvailable() != null && !itemDto.getAvailable().equals(existingItem.getAvailable())) {
-            updatedItem.setAvailable(itemDto.getAvailable());
+            existingItem.setAvailable(itemDto.getAvailable());
         }
 
-        updatedItem.setOwner(user);
-        return itemRepository.update(updatedItem);
+        return itemRepository.save(existingItem);
+
     }
 
     @Override
-    public Item getItem(Integer itemId) {
-        return itemRepository.getItem(itemId);
+    public Item getItem(Integer itemId) { // работает
+        Optional<Item> item = itemRepository.findById(itemId);
+        return item.orElseThrow(() -> new EntityNotFoundException(Item.class,
+                "Вещь с id " + itemId + " не найдена."));
     }
 
     @Override
     public List<Item> getItems(Integer userId) {
-        userRepository.findById(userId);
-        return itemRepository.getItems(userId);
+        userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                        "Пользователь с id " + userId + " не найден."));
+
+        return itemRepository.findByOwnerId(userId);
     }
 
     @Override
     public List<Item> search(String text) {
-        return itemRepository.search(text);
+        if (text == null || text.isBlank() || text.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return itemRepository.searchByNameAndDescription(text.toLowerCase());
+
+        // return itemRepository.findByAvailableIsTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(text, text);
     }
 
 }

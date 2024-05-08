@@ -3,27 +3,33 @@ package ru.practicum.shareit.item.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 
+@DynamicUpdate
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @NotNull
+    @Column(name = "available", nullable = false)
     private Boolean available;
 
+    @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
 
 

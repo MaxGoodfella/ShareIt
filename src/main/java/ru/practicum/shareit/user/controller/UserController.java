@@ -52,12 +52,18 @@ public class UserController {
         return fetchedUsers;
     }
 
+//    @DeleteMapping(value = "/{userId}")
+//    public boolean deleteById(@PathVariable("userId") Integer userID) {
+//        log.info("Start deleting user with id = {}", userID);
+//        boolean isDeleted = userService.deleteById(userID);
+//        log.info("Finish deleting user with id = {}", userID);
+//        return isDeleted;
+//    }
+
     @DeleteMapping(value = "/{userId}")
-    public boolean deleteById(@PathVariable("userId") Integer userID) {
+    public void deleteById(@PathVariable("userId") Integer userID) {
         log.info("Start deleting user with id = {}", userID);
-        boolean isDeleted = userService.deleteById(userID);
-        log.info("Finish deleting user with id = {}", userID);
-        return isDeleted;
+        userService.deleteById(userID);
     }
 
 }
