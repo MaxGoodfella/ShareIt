@@ -1,11 +1,14 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Past;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,5 +25,43 @@ public class ItemDto {
 
     @NotNull
     private Boolean available;
+
+    private ItemBookingDto lastBooking; // это не просто localdatetime, там ещё и букер айди нужен
+
+    private ItemBookingDto nextBooking;
+
+    private List<ItemCommentDto> comments;
+
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ItemBookingDto {
+
+        Integer id;
+
+        LocalDateTime start;
+
+        LocalDateTime end;
+
+        Integer bookerId;
+
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ItemCommentDto {
+
+        Integer id;
+
+        @NotNull
+        private String text;
+
+        private String authorName;
+
+        LocalDateTime created;
+
+    }
 
 }

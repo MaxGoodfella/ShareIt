@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.controller;
 
+import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import lombok.AllArgsConstructor;
@@ -40,18 +41,35 @@ public class ItemController {
         return updatedItem;
     }
 
+//    @GetMapping("/{itemId}")
+//    public Item getItemByItemId(@PathVariable Integer itemId) {
+//        log.info("Start fetching item with id = {}", itemId);
+//        Item fetchedItem = itemService.getItem(itemId);
+//        log.info("Finish fetching item with id = {}", fetchedItem.getId());
+//        return fetchedItem;
+//    }
+
     @GetMapping("/{itemId}")
-    public Item getItemByItemId(@PathVariable Integer itemId) {
+    public ItemDto getItemByItemId(@RequestHeader(REQUEST_HEADER) Integer userId,
+                                   @PathVariable Integer itemId) {
         log.info("Start fetching item with id = {}", itemId);
-        Item fetchedItem = itemService.getItem(itemId);
+        ItemDto fetchedItem = itemService.getItem(userId, itemId);
         log.info("Finish fetching item with id = {}", fetchedItem.getId());
         return fetchedItem;
     }
 
+//    @GetMapping
+//    public List<Item> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
+//        log.info("Start fetching items for user with id = {}", userId);
+//        List<Item> fetchedItems = itemService.getItems(userId);
+//        log.info("Finish fetching items for user with id = {}", userId);
+//        return fetchedItems;
+//    }
+
     @GetMapping
-    public List<Item> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
+    public List<ItemDto> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
         log.info("Start fetching items for user with id = {}", userId);
-        List<Item> fetchedItems = itemService.getItems(userId);
+        List<ItemDto> fetchedItems = itemService.getItems(userId);
         log.info("Finish fetching items for user with id = {}", userId);
         return fetchedItems;
     }
@@ -62,6 +80,16 @@ public class ItemController {
         List<Item> fetchedItems = itemService.search(text);
         log.info("Finish fetching items by name/description using 'text' parameter = {}", text);
         return fetchedItems;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ItemDto.ItemCommentDto  addComment(@RequestHeader(REQUEST_HEADER) Integer userId,
+                              @PathVariable("itemId") Integer itemId,
+                              @RequestBody ItemDto.ItemCommentDto comment) {
+        log.info("Start adding comment {} to item with id = {}", comment, itemId);
+        ItemDto.ItemCommentDto  addedComment = itemService.addComment(userId, itemId, comment);
+        log.info("Finish adding comment {} to item with id = {}", addedComment, itemId);
+        return addedComment;
     }
 
 }

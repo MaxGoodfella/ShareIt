@@ -12,6 +12,7 @@ import javax.validation.constraints.Email;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
+// @Table(name = "USERS", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(columnNames = "EMAIL"))
 public class User {
 
     @Id
