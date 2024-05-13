@@ -4,5 +4,5 @@ public enum BookingTimeState {
     ALL,
     CURRENT,
     FUTURE,
-    PAST;
+    PAST
 }

@@ -82,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = booking.getItem();
 
-        if (!item.getOwner().getId().equals(userId)) {;
+        if (!item.getOwner().getId().equals(userId)) {
             throw new EntityNotFoundException(Integer.class,
                     "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
         }
