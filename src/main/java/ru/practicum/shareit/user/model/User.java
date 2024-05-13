@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.model;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -7,9 +8,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 
+
 @DynamicUpdate
 @Data
 @NoArgsConstructor
+@Builder
 @Entity
 @Table(name = "users")
 // @Table(name = "USERS", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(columnNames = "EMAIL"))
@@ -27,6 +30,12 @@ public class User {
     private String email;
 
     public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public User(Integer id, String name, String email) {
+        this.id = id;
         this.name = name;
         this.email = email;
     }

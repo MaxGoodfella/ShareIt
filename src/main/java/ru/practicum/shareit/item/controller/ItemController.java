@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
-import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,10 +50,10 @@ public class ItemController {
 //    }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemByItemId(@RequestHeader(REQUEST_HEADER) Integer userId,
-                                   @PathVariable Integer itemId) {
+    public ItemDtoOut getItemByItemId(@RequestHeader(REQUEST_HEADER) Integer userId,
+                                      @PathVariable Integer itemId) {
         log.info("Start fetching item with id = {}", itemId);
-        ItemDto fetchedItem = itemService.getItem(userId, itemId);
+        ItemDtoOut fetchedItem = itemService.getItem(userId, itemId);
         log.info("Finish fetching item with id = {}", fetchedItem.getId());
         return fetchedItem;
     }
@@ -67,9 +67,9 @@ public class ItemController {
 //    }
 
     @GetMapping
-    public List<ItemDto> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
+    public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
         log.info("Start fetching items for user with id = {}", userId);
-        List<ItemDto> fetchedItems = itemService.getItems(userId);
+        List<ItemDtoOut> fetchedItems = itemService.getItems(userId);
         log.info("Finish fetching items for user with id = {}", userId);
         return fetchedItems;
     }

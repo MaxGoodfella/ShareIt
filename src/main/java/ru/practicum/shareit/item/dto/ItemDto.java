@@ -26,11 +26,13 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    private ItemBookingDto lastBooking; // это не просто localdatetime, там ещё и букер айди нужен
+    private ItemBookingDto lastBooking;
 
     private ItemBookingDto nextBooking;
 
     private List<ItemCommentDto> comments;
+
+
 
 
     @Getter
@@ -64,4 +66,10 @@ public class ItemDto {
 
     }
 
+
+    public ItemDto(String name, String description, Boolean available) {
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }

@@ -6,7 +6,7 @@ public enum BookingTimeState {
     FUTURE,
     PAST;
 
-    static BookingTimeState from(String state) {
+    public static BookingTimeState from(String state) {
         for (BookingTimeState bookingTimeState : BookingTimeState.values()) {
             if (bookingTimeState.name().equalsIgnoreCase(state)) {
                 return bookingTimeState;

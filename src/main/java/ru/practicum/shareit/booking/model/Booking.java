@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
@@ -20,9 +21,10 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "bookings")
-public class Booking {
+public class Booking implements Comparable<Booking> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,11 +46,17 @@ public class Booking {
     @JoinColumn(name = "booker_id")
     private User booker;
 
-    @Column(name = "state")
-    private BookingState state;
+    @Column(name = "status")
+    private BookingState status;
 
     @JsonIgnore
     @Transient
     private BookingTimeState bookingTimeState;
+
+
+    @Override
+    public int compareTo(Booking booking) {
+        return booking.getEnd().compareTo(this.end);
+    }
 
 }

@@ -2,14 +2,9 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @DynamicUpdate
 @Data

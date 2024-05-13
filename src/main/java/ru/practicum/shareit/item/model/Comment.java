@@ -1,18 +1,16 @@
-package ru.practicum.shareit.item.comment;
+package ru.practicum.shareit.item.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import ru.practicum.shareit.item.model.Item;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "comments")
 public class Comment {
 
@@ -34,5 +32,11 @@ public class Comment {
     // @NotNull
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
+
+    public Comment(String text, Item item, User author) {
+        this.text = text;
+        this.item = item;
+        this.author = author;
+    }
 
 }

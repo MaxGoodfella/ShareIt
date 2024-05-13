@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.booking.model.BookingTimeState;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
@@ -65,6 +66,13 @@ public class BookingController {
     @GetMapping
     public List<Booking> getBookingsSentByUserId(@RequestHeader(REQUEST_HEADER) Integer userId,
                                              @RequestParam(value = "state", defaultValue = "ALL") String state) {
+
+//        BookingTimeState bookingTimeState = BookingTimeState.from(state);
+//        if (bookingTimeState == null) {
+//            throw new IllegalArgumentException("Unsupported state: " + state);
+//        }
+
+
         log.info("Start fetching bookings with state '{}' from user with id = {}", userId, state);
         List<Booking> fetchedBookings = bookingService.getBookingsSent(userId, state.toUpperCase());
         log.info("Finish fetching bookings with state '{}' from user with id = {}", userId, state);

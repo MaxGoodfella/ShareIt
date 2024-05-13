@@ -32,7 +32,7 @@ public class BookingDto {
     @NotNull
     private Integer itemId;
 
-    private BookingState state;
+    private BookingState status;
 
     private BookingTimeState bookingTimeState;
 

@@ -24,12 +24,12 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Email cannot be null");
         }
 
-        if (userRepository.findByName(user.getName()) != null
-                || userRepository.findByEmail(user.getEmail()) != null) {
-            throw new EntityAlreadyExistsException(User.class,
-                    "User with email '" + user.getEmail() + "' and/or with name '"
-                            + user.getName() + "' already exists");
-        }
+//        if (userRepository.findByName(user.getName()) != null
+//                || userRepository.findByEmail(user.getEmail()) != null) {
+//            throw new EntityAlreadyExistsException(User.class,
+//                    "User with email '" + user.getEmail() + "' and/or with name '"
+//                            + user.getName() + "' already exists");
+//        }
 
         return userRepository.save(user);
     }

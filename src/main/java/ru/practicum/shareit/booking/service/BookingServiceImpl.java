@@ -45,16 +45,24 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException(Item.class,
                         "Предмет с id " + bookingDto.getItemId() + " не найден."));
 
+
+        if (item.getOwner().getId().equals(userId)) {
+            throw new EntityNotFoundException(Integer.class,
+                    "Пользователь с id = " + userId + " не может забронировать свой же предмет");
+        }
+
+
         if (!item.getAvailable()) {
-            throw new BadRequestException(Item.class, "Предмет с id = " + item.getId() + " недоступен для бронирования");
+            throw new BadRequestException(Item.class,
+                    "Предмет с id = " + item.getId() + " недоступен для бронирования");
         }
 
         Booking newBooking = modelMapper.map(bookingDto, Booking.class);
 
         newBooking.setBooker(user);
         newBooking.setItem(item);
-        newBooking.setState(BookingState.WAITING);
-        newBooking.setBookingTimeState(BookingTimeState.ALL); // ????
+        newBooking.setStatus(BookingState.WAITING);
+        newBooking.setBookingTimeState(BookingTimeState.ALL); // ???
 
         return bookingRepository.save(newBooking);
 
@@ -74,20 +82,24 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = booking.getItem();
 
+        // TODO: не очень
+
         if (!item.getOwner().getId().equals(userId)) {
-            throw new AccessDeniedException(Integer.class,
+//            throw new AccessDeniedException(Integer.class,
+//                    "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
+            throw new EntityNotFoundException(Integer.class,
                     "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
         }
 
-        if (booking.getState().equals(BookingState.APPROVED)) {
+        if (booking.getStatus().equals(BookingState.APPROVED)) {
             throw new BadRequestException(Item.class,
                     "Бронирование с id = " + bookingId + " уже подтверждено пользователем с id = " + userId);
         }
 
         if (approved) {
-            booking.setState(BookingState.APPROVED);
+            booking.setStatus(BookingState.APPROVED);
         } else {
-            booking.setState(BookingState.REJECTED);
+            booking.setStatus(BookingState.REJECTED);
         }
 
         return bookingRepository.save(booking);
@@ -108,8 +120,10 @@ public class BookingServiceImpl implements BookingService {
 
 
         if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
-            throw new AccessDeniedException(Integer.class,
-                    "Пользователь с id = " + userId + " не имеет права просматривать данное бронирование.");
+//            throw new AccessDeniedException(Integer.class,
+//                    "Пользователь с id = " + userId + " не имеет права просматривать данное бронирование.");
+            throw new EntityNotFoundException(Booking.class,
+                    "Бронирование с id " + bookingId + " не найдено.");
         }
 
         return booking;
@@ -154,13 +168,13 @@ public class BookingServiceImpl implements BookingService {
 //                    filteredBookings.add(booking);
 //                    break;
 //                default:
-//                    if (booking.getState() != null) {
-//                        switch (booking.getState()) {
+//                    if (booking.getStatus() != null) {
+//                        switch (booking.getStatus()) {
 //                            case WAITING:
 //                            case APPROVED:
 //                            case REJECTED:
 //                            case CANCELED:
-//                                if (booking.getState().name().equalsIgnoreCase(state)) {
+//                                if (booking.getStatus().name().equalsIgnoreCase(state)) {
 //                                    filteredBookings.add(booking);
 //                                }
 //                                // break;
@@ -218,13 +232,13 @@ public class BookingServiceImpl implements BookingService {
 //                    filteredBookings.add(booking);
 //                    break;
 //                default:
-//                    if (booking.getState() != null) {
-//                        switch (booking.getState()) {
+//                    if (booking.getStatus() != null) {
+//                        switch (booking.getStatus()) {
 //                            case WAITING:
 //                            case APPROVED:
 //                            case REJECTED:
 //                            case CANCELED:
-//                                if (booking.getState().name().equalsIgnoreCase(state)) {
+//                                if (booking.getStatus().name().equalsIgnoreCase(state)) {
 //                                    filteredBookings.add(booking);
 //                                }
 //                                // break;
@@ -242,32 +256,62 @@ public class BookingServiceImpl implements BookingService {
 //        return filteredBookings;
     }
 
-//    @Override
-//    public Booking updateBookingStatus(Integer userId, Integer bookingId, BookingDto bookingDto) {
+
+
+//    private List<Booking> filterBookingsByState(List<Booking> bookings, String state) {
+//        List<Booking> filteredBookings = new ArrayList<>();
+//        LocalDateTime now = LocalDateTime.now();
 //
-//        Item item = itemRepository.findById(bookingDto.getItemId())
-//                .orElseThrow(() -> new EntityNotFoundException(Item.class,
-//                        "Предмет с id " + bookingDto.getItemId() + " не найден."));
-//
-//        Booking booking = bookingRepository.findById(bookingId)
-//                .orElseThrow(() -> new EntityNotFoundException(Booking.class,
-//                        "Бронирование с id " + bookingId + " не найдено."));
-//
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new EntityNotFoundException(User.class,
-//                        "Пользователь с id " + userId + " не найден."));
-//
-//        if (!item.getOwner().getId().equals(userId)) {
-//            throw new AccessDeniedException(Integer.class,
-//                    "Пользователь с id = " + userId +  " не имеет права обновлять эту вещь.");
+//        for (Booking booking : bookings) {
+//            switch (state) {
+//                case "CURRENT":
+//                    if (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)) {
+//                        booking.setBookingTimeState(BookingTimeState.CURRENT);
+//                        filteredBookings.add(booking);
+//                    }
+//                    break;
+//                case "PAST":
+//                    if (booking.getEnd().isBefore(now)) {
+//                        booking.setBookingTimeState(BookingTimeState.PAST);
+//                        filteredBookings.add(booking);
+//                    }
+//                    break;
+//                case "FUTURE":
+//                    if (booking.getStart().isAfter(now)) {
+//                        booking.setBookingTimeState(BookingTimeState.FUTURE);
+//                        filteredBookings.add(booking);
+//                    }
+//                    break;
+//                case "":
+//                case "ALL":
+//                    filteredBookings.add(booking);
+//                    break;
+//                default:
+//                    if (booking.getStatus() != null) {
+//                        switch (booking.getStatus()) {
+//                            case WAITING:
+//                            case APPROVED:
+//                            case REJECTED:
+//                            case CANCELED:
+//                                if (booking.getStatus().name().equalsIgnoreCase(state)) {
+//                                    filteredBookings.add(booking);
+//                                }
+//                                break;
+//                            default:
+//                                throw new IllegalArgumentException("Unknown state: " + state);
+//                        }
+//                    }
+//                    break;
+//            }
 //        }
 //
-//        return bookingRepository.save(booking);
+//        filteredBookings.sort(Comparator.comparing(Booking::getStart).reversed());
+//        return filteredBookings;
 //    }
 
-
-
     private List<Booking> filterBookingsByState(List<Booking> bookings, String state) {
+
+
         List<Booking> filteredBookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
@@ -296,17 +340,18 @@ public class BookingServiceImpl implements BookingService {
                     filteredBookings.add(booking);
                     break;
                 default:
-                    if (booking.getState() != null) {
-                        switch (booking.getState()) {
+                    if (booking.getStatus() != null) {
+                        switch (booking.getStatus()) {
                             case WAITING:
                             case APPROVED:
                             case REJECTED:
                             case CANCELED:
-                                if (booking.getState().name().equalsIgnoreCase(state)) {
+                                if (booking.getStatus().name().equalsIgnoreCase(state)) {
                                     filteredBookings.add(booking);
                                 }
+                                break;
                             default:
-                                throw new IllegalArgumentException("Unknown state: " + state);
+                                throw new IllegalArgumentException("Unsupported state: " + state);
                         }
                     }
                     break;
@@ -316,5 +361,6 @@ public class BookingServiceImpl implements BookingService {
         filteredBookings.sort(Comparator.comparing(Booking::getStart).reversed());
         return filteredBookings;
     }
+
 
 }
