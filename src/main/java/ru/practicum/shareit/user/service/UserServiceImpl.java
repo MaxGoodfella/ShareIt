@@ -18,22 +18,15 @@ public class UserServiceImpl implements UserService {
 
     private final JpaUserRepository userRepository;
 
+
     @Override
     public User save(User user) {
         if (user.getEmail() == null) {
             throw new IllegalArgumentException("Email cannot be null");
         }
 
-//        if (userRepository.findByName(user.getName()) != null
-//                || userRepository.findByEmail(user.getEmail()) != null) {
-//            throw new EntityAlreadyExistsException(User.class,
-//                    "User with email '" + user.getEmail() + "' and/or with name '"
-//                            + user.getName() + "' already exists");
-//        }
-
         return userRepository.save(user);
     }
-
 
     @Override
     public User update(Integer userID, User updatedUser) {
@@ -41,14 +34,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userID)
                 .orElseThrow(() -> new EntityNotFoundException(User.class,
                         "Пользователь с id " + userID + " не найден."));
-
-
-        if (!Objects.equals(user.getName(), updatedUser.getName())) {
-            if (userRepository.findByName(updatedUser.getName()) != null) {
-                throw new EntityAlreadyExistsException(User.class,
-                        "Пользователь с именем '" + updatedUser.getName() + "' уже существует.");
-            }
-        }
 
         if (!Objects.equals(user.getEmail(), updatedUser.getEmail())) {
             if (userRepository.findByEmail(updatedUser.getEmail()) != null) {

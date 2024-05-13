@@ -12,9 +12,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDtoOut {
+
     private Integer id;
+
     private String text;
+
     private String authorName;
+
     private LocalDateTime created;
+
     private Integer itemId;
+
 }

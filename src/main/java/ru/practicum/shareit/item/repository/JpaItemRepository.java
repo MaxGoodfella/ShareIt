@@ -18,6 +18,4 @@ public interface JpaItemRepository extends JpaRepository<Item, Integer> {
             " AND (LOWER(i.name) LIKE %:text% OR LOWER(i.description) LIKE %:text%) ORDER BY i.id ASC")
     List<Item> searchByNameAndDescription(@Param("text") String text);
 
-    // List<Item> findByAvailableIsTrueAndNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description);
-
 }

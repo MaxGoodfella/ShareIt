@@ -3,7 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.*;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -21,7 +21,7 @@ public class Comment {
     @Column(name = "text", nullable = false)
     private String text;
 
-    @ManyToOne(fetch = FetchType.EAGER) // eager - подгрузить всю сущность, lazy - только айдишник
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id")
     private Item item;
 
@@ -29,14 +29,7 @@ public class Comment {
     @JoinColumn(name = "author_id")
     private User author;
 
-    // @NotNull
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
-
-    public Comment(String text, Item item, User author) {
-        this.text = text;
-        this.item = item;
-        this.author = author;
-    }
 
 }

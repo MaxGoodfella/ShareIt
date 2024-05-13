@@ -15,7 +15,6 @@ public interface BookingService {
 
     List<Booking> getBookingsReceived(Integer userId, String state);
 
-    // Booking updateBookingStatus(Integer userId, Integer bookingId, BookingDto bookingDto);
     Booking updateBookingStatus(Integer userId, Integer bookingId, boolean approved);
 
 }

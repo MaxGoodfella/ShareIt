@@ -5,13 +5,4 @@ public enum BookingTimeState {
     CURRENT,
     FUTURE,
     PAST;
-
-    public static BookingTimeState from(String state) {
-        for (BookingTimeState bookingTimeState : BookingTimeState.values()) {
-            if (bookingTimeState.name().equalsIgnoreCase(state)) {
-                return bookingTimeState;
-            }
-        }
-        return null;
-    }
 }

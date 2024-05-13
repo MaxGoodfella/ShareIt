@@ -1,17 +1,15 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingTimeState;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
-import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -21,11 +19,9 @@ public class BookingDto {
 
     private Integer id;
 
-    // @NotNull
     @FutureOrPresent
     private LocalDateTime start;
 
-    // @NotNull
     @Future
     private LocalDateTime end;
 

@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR NOT NULL,
     CONSTRAINT pk_user PRIMARY KEY (id),
     CONSTRAINT UQ_USER_EMAIL UNIQUE (email)
-    -- ,
-    -- CONSTRAINT UQ_USER_NAME UNIQUE (name)
 );
 
 CREATE TABLE IF NOT EXISTS items (
@@ -16,7 +14,6 @@ CREATE TABLE IF NOT EXISTS items (
     description VARCHAR NOT NULL,
     available BOOLEAN default false,
     owner_id int references users (id) ON DELETE CASCADE,
---     request_id int references requests (id)
 
     CONSTRAINT pk_item PRIMARY KEY (id)
 );

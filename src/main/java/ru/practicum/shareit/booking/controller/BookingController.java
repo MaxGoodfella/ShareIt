@@ -1,14 +1,13 @@
 package ru.practicum.shareit.booking.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.model.BookingTimeState;
-import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 
@@ -32,16 +31,6 @@ public class BookingController {
         return addedBooking;
     }
 
-//    @PatchMapping("/{bookingId}")
-//    public Booking updateBookingStatus(@RequestHeader(REQUEST_HEADER) Integer userId,
-//                                       @PathVariable("bookingId") Integer bookingId,
-//                                       @RequestParam("approved") boolean approved) {
-//        log.info("Start updating booking status for bookingId {}", bookingId);
-//        Booking updatedBooking = bookingService.updateBookingStatus(userId, bookingId, bookingDto);
-//        log.info("Finish updating booking status for bookingId {}", bookingId);
-//        return updatedBooking;
-//    }
-
     @PatchMapping("/{bookingId}")
     public Booking updateBookingStatus(@RequestHeader(REQUEST_HEADER) Integer userId,
                                        @PathVariable("bookingId") Integer bookingId,
@@ -51,8 +40,6 @@ public class BookingController {
         log.info("Finish updating booking status for bookingId {}", bookingId);
         return updatedBooking;
     }
-
-    // вероятно нужен ещё схожий метод, но где создатель бронирования устанавливает статус CANCELLED
 
     @GetMapping("/{bookingId}")
     public Booking getBookingByBookingId(@RequestHeader(REQUEST_HEADER) Integer userId,
@@ -66,13 +53,6 @@ public class BookingController {
     @GetMapping
     public List<Booking> getBookingsSentByUserId(@RequestHeader(REQUEST_HEADER) Integer userId,
                                              @RequestParam(value = "state", defaultValue = "ALL") String state) {
-
-//        BookingTimeState bookingTimeState = BookingTimeState.from(state);
-//        if (bookingTimeState == null) {
-//            throw new IllegalArgumentException("Unsupported state: " + state);
-//        }
-
-
         log.info("Start fetching bookings with state '{}' from user with id = {}", userId, state);
         List<Booking> fetchedBookings = bookingService.getBookingsSent(userId, state.toUpperCase());
         log.info("Finish fetching bookings with state '{}' from user with id = {}", userId, state);

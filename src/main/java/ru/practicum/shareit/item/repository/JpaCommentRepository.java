@@ -10,4 +10,5 @@ public interface JpaCommentRepository extends JpaRepository<Comment, Integer> {
     List<Comment> findAllByItemId(Integer itemId);
 
     List<Comment> findAllByItemIdIn(List<Integer> itemIds);
+
 }

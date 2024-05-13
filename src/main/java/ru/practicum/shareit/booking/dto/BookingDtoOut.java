@@ -15,12 +15,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class BookingDtoOut {
+
     private Integer id;
+
     private ItemDtoOut item;
+
     private LocalDateTime start;
+
     private LocalDateTime end;
+
     private UserDto booker;
+
     private BookingState status;
+
 
     public Integer getItemId() {
         return item.getId();
@@ -29,4 +36,5 @@ public class BookingDtoOut {
     public int getBookerId() {
         return booker.getId();
     }
+
 }

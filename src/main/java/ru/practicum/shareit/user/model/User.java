@@ -1,21 +1,20 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 
 
 @DynamicUpdate
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @Builder
 @Entity
 @Table(name = "users")
-// @Table(name = "USERS", schema = "PUBLIC", uniqueConstraints = @UniqueConstraint(columnNames = "EMAIL"))
 public class User {
 
     @Id

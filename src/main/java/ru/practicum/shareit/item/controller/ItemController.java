@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 
 
@@ -21,6 +21,7 @@ public class ItemController {
     private final ItemService itemService;
 
     private final static String REQUEST_HEADER = "X-Sharer-User-Id";
+
 
     @PostMapping
     public Item add(@RequestHeader(REQUEST_HEADER) Integer userId,
@@ -41,14 +42,6 @@ public class ItemController {
         return updatedItem;
     }
 
-//    @GetMapping("/{itemId}")
-//    public Item getItemByItemId(@PathVariable Integer itemId) {
-//        log.info("Start fetching item with id = {}", itemId);
-//        Item fetchedItem = itemService.getItem(itemId);
-//        log.info("Finish fetching item with id = {}", fetchedItem.getId());
-//        return fetchedItem;
-//    }
-
     @GetMapping("/{itemId}")
     public ItemDtoOut getItemByItemId(@RequestHeader(REQUEST_HEADER) Integer userId,
                                       @PathVariable Integer itemId) {
@@ -57,14 +50,6 @@ public class ItemController {
         log.info("Finish fetching item with id = {}", fetchedItem.getId());
         return fetchedItem;
     }
-
-//    @GetMapping
-//    public List<Item> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
-//        log.info("Start fetching items for user with id = {}", userId);
-//        List<Item> fetchedItems = itemService.getItems(userId);
-//        log.info("Finish fetching items for user with id = {}", userId);
-//        return fetchedItems;
-//    }
 
     @GetMapping
     public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
