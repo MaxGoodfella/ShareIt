@@ -3,8 +3,8 @@ package ru.practicum.shareit.request;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Data

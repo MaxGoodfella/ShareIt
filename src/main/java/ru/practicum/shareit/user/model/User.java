@@ -3,8 +3,8 @@ package ru.practicum.shareit.user.model;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 
 
 @DynamicUpdate

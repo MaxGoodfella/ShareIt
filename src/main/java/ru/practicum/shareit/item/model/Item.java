@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import ru.practicum.shareit.user.model.User;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @DynamicUpdate
 @Getter

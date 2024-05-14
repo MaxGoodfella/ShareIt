@@ -1,9 +1,9 @@
 package ru.practicum.shareit.booking.dto;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
