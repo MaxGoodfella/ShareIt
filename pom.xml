@@ -95,6 +95,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+					<jvmArguments>--enable-preview</jvmArguments>
 				</configuration>
 			</plugin>
             <plugin>
