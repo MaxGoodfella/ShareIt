@@ -17,9 +17,9 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
-    private final BookingService bookingService;
+    private static final String REQUEST_HEADER = "X-Sharer-User-Id";
 
-    private final static String REQUEST_HEADER = "X-Sharer-User-Id";
+    private final BookingService bookingService;
 
 
     @PostMapping
