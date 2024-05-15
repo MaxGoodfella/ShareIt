@@ -98,6 +98,35 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public ItemDtoOut getItem(Integer userId, Integer itemId) {
+
+        Optional<Item> itemGet = itemRepository.findById(itemId);
+        if (itemGet.isEmpty()) {
+            throw new EntityNotFoundException(Item.class, String.valueOf(itemId),
+                    "Вещь с id " + itemId + " не найдена.");
+        }
+
+        Item item = itemGet.get();
+        ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
+        itemDtoOut.setComments(getAllItemComments(itemId));
+
+        if (!item.getOwner().getId().equals(userId)) {
+            return itemDtoOut;
+        }
+
+        List<Booking> bookings = bookingRepository.findAllByItemAndStatusOrderByStartAsc(item, BookingState.APPROVED);
+        List<BookingDtoOut> bookingDTOList = bookings
+                .stream()
+                .map(BookingMapper::toBookingOut)
+                .collect(toList());
+
+        itemDtoOut.setLastBooking(getLastBooking(bookingDTOList, LocalDateTime.now()));
+        itemDtoOut.setNextBooking(getNextBooking(bookingDTOList, LocalDateTime.now()));
+        return itemDtoOut;
+
+    }
+
+    @Override
     public List<ItemDtoOut> getItems(Integer userId) {
 
         userRepository.findById(userId)
@@ -130,7 +159,6 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toList());
 
     }
-
 
     @Override
     public List<Item> search(String text) {
@@ -183,35 +211,6 @@ public class ItemServiceImpl implements ItemService {
         comment = commentRepository.save(comment);
 
         return CommentMapper.mapToItemCommentDto(comment);
-
-    }
-
-    @Override
-    public ItemDtoOut getItem(Integer userId, Integer itemId) {
-
-        Optional<Item> itemGet = itemRepository.findById(itemId);
-        if (itemGet.isEmpty()) {
-            throw new EntityNotFoundException(Item.class, String.valueOf(itemId),
-                    "Вещь с id " + itemId + " не найдена.");
-        }
-
-        Item item = itemGet.get();
-        ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
-        itemDtoOut.setComments(getAllItemComments(itemId));
-
-        if (!item.getOwner().getId().equals(userId)) {
-            return itemDtoOut;
-        }
-
-        List<Booking> bookings = bookingRepository.findAllByItemAndStatusOrderByStartAsc(item, BookingState.APPROVED);
-        List<BookingDtoOut> bookingDTOList = bookings
-                .stream()
-                .map(BookingMapper::toBookingOut)
-                .collect(toList());
-
-        itemDtoOut.setLastBooking(getLastBooking(bookingDTOList, LocalDateTime.now()));
-        itemDtoOut.setNextBooking(getNextBooking(bookingDTOList, LocalDateTime.now()));
-        return itemDtoOut;
 
     }
 
