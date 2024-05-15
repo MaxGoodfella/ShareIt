@@ -50,14 +50,16 @@ public class ItemServiceImpl implements ItemService {
     public Item add(Integer userId, ItemDto itemDto) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         Item newItem = modelMapper.map(itemDto, Item.class);
 
         if (itemRepository.findByNameAndDescription(newItem.getName(), newItem.getDescription()).isPresent()) {
-            throw new EntityAlreadyExistsException(Item.class, "Item с названием '" +
-                    newItem.getName() + "' и описанием '" + newItem.getDescription() + "' уже зарегистрирован.");
+            throw new EntityAlreadyExistsException(Item.class,
+                    "Item с названием '" + newItem.getName() +
+                            "' и описанием '" + newItem.getDescription() +
+                            "' уже зарегистрирован.");
         }
 
         newItem.setOwner(user);
@@ -69,15 +71,15 @@ public class ItemServiceImpl implements ItemService {
     public Item update(Integer userId, Integer itemId, ItemDto itemDto) {
 
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         Item existingItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(Item.class,
+                .orElseThrow(() -> new EntityNotFoundException(Item.class, String.valueOf(itemId),
                         "Вещь с id " + itemId + " не найдена."));
 
         if (!existingItem.getOwner().getId().equals(userId)) {
-            throw new AccessDeniedException(Integer.class,
+            throw new AccessDeniedException(Integer.class, String.valueOf(userId),
                     "Пользователь с id = " + userId + " не имеет права обновлять эту вещь.");
         }
 
@@ -99,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDtoOut> getItems(Integer userId) {
 
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         List<Item> itemList = itemRepository.findByOwnerId(userId);
@@ -118,7 +120,7 @@ public class ItemServiceImpl implements ItemService {
                 .collect(groupingBy(BookingDtoOut::getItemId, toList()));
 
         return itemList.stream()
-                .sorted(Comparator.comparingInt(Item::getId)) // Сортировка по идентификатору
+                .sorted(Comparator.comparingInt(Item::getId))
                 .map(item -> ItemMapper.toItemDtoOut(
                         item,
                         getLastBooking(bookings.get(item.getId()), LocalDateTime.now()),
@@ -145,11 +147,11 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto.ItemCommentDto addComment(Integer userId, Integer itemId, ItemDto.ItemCommentDto commentDto) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new EntityNotFoundException(Item.class,
+                .orElseThrow(() -> new EntityNotFoundException(Item.class, String.valueOf(itemId),
                         "Вещь с id " + itemId + " не найдена."));
 
         if (commentDto.getText() == null || commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
@@ -171,7 +173,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         if (!hasApprovedBooking) {
-            throw new BadRequestException(Item.class,
+            throw new BadRequestException(Item.class, String.valueOf(itemId),
                     "Пользователь не брал вещь c id = " + itemId + " в аренду или аренда еще не завершена.");
         }
 
@@ -189,12 +191,12 @@ public class ItemServiceImpl implements ItemService {
 
         Optional<Item> itemGet = itemRepository.findById(itemId);
         if (itemGet.isEmpty()) {
-            throw new EntityNotFoundException(Item.class,
+            throw new EntityNotFoundException(Item.class, String.valueOf(itemId),
                     "Вещь с id " + itemId + " не найдена.");
         }
 
         Item item = itemGet.get();
-        ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(itemGet.get());
+        ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
         itemDtoOut.setComments(getAllItemComments(itemId));
 
         if (!item.getOwner().getId().equals(userId)) {
@@ -214,7 +216,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    public List<CommentDtoOut> getAllItemComments(Integer itemId) {
+    private List<CommentDtoOut> getAllItemComments(Integer itemId) {
         List<Comment> comments = commentRepository.findAllByItemId(itemId);
 
         return comments.stream()

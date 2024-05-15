@@ -41,20 +41,20 @@ public class BookingServiceImpl implements BookingService {
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> new EntityNotFoundException(Item.class,
+                .orElseThrow(() -> new EntityNotFoundException(Item.class, String.valueOf(bookingDto.getItemId()),
                         "Предмет с id " + bookingDto.getItemId() + " не найден."));
 
         if (item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class,
+            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
                     "Пользователь с id = " + userId + " не может забронировать свой же предмет");
         }
 
         if (!item.getAvailable()) {
-            throw new BadRequestException(Item.class,
+            throw new BadRequestException(Item.class, String.valueOf(item.getId()),
                     "Предмет с id = " + item.getId() + " недоступен для бронирования");
         }
 
@@ -73,22 +73,22 @@ public class BookingServiceImpl implements BookingService {
     public Booking updateBookingStatus(Integer userId, Integer bookingId, boolean approved) {
 
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException(Booking.class,
+                .orElseThrow(() -> new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
                         "Бронирование с id " + bookingId + " не найдено."));
 
         Item item = booking.getItem();
 
         if (!item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class,
+            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
                     "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
         }
 
         if (booking.getStatus().equals(BookingState.APPROVED)) {
-            throw new BadRequestException(Item.class,
+            throw new BadRequestException(Item.class, String.valueOf(bookingId),
                     "Бронирование с id = " + bookingId + " уже подтверждено пользователем с id = " + userId);
         }
 
@@ -106,15 +106,15 @@ public class BookingServiceImpl implements BookingService {
     public Booking getBooking(Integer userId, Integer bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityNotFoundException(Booking.class,
+                .orElseThrow(() -> new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
                         "Бронирование с id " + bookingId + " не найдено."));
 
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
-            throw new EntityNotFoundException(Booking.class,
+            throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
                     "Бронирование с id " + bookingId + " не найдено.");
         }
 
@@ -125,7 +125,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsSent(Integer userId, String state) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         List<Booking> bookings = bookingRepository.findBookingsByBooker_Id(userId);
@@ -135,7 +135,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsReceived(Integer userId, String state) {
        userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
         List<Booking> bookings = bookingRepository.findBookingsByItem_Owner_Id(userId);
@@ -145,42 +145,27 @@ public class BookingServiceImpl implements BookingService {
 
     private List<Booking> filterBookingsByState(List<Booking> bookings, String state) {
 
+        validateState(state);
+
         List<Booking> filteredBookings = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
 
         for (Booking booking : bookings) {
             switch (state) {
                 case "CURRENT":
-                    if (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)) {
-                        booking.setBookingTimeState(BookingTimeState.CURRENT);
-                        filteredBookings.add(booking);
-                    }
+                    filterCurrentBookings(booking, now, filteredBookings);
                     break;
                 case "PAST":
-                    if (booking.getEnd().isBefore(now)) {
-                        booking.setBookingTimeState(BookingTimeState.PAST);
-                        filteredBookings.add(booking);
-                    }
+                    filterPastBookings(booking, now, filteredBookings);
                     break;
                 case "FUTURE":
-                    if (booking.getStart().isAfter(now)) {
-                        booking.setBookingTimeState(BookingTimeState.FUTURE);
-                        filteredBookings.add(booking);
-                    }
+                    filterFutureBookings(booking, now, filteredBookings);
                     break;
                 case "":
                 case "ALL":
                     filteredBookings.add(booking);
                     break;
                 default:
-
-                    if (!(state.equalsIgnoreCase("WAITING")
-                            || state.equalsIgnoreCase("APPROVED")
-                            || state.equalsIgnoreCase("REJECTED")
-                            || state.equalsIgnoreCase("CANCELED"))) {
-                        throw new IllegalArgumentException("Unknown state: " + state);
-                    }
-
                     if (booking.getStatus() != null) {
                         switch (booking.getStatus()) {
                             case WAITING:
@@ -200,6 +185,41 @@ public class BookingServiceImpl implements BookingService {
         filteredBookings.sort(Comparator.comparing(Booking::getStart).reversed());
         return filteredBookings;
 
+    }
+
+    private void filterCurrentBookings(Booking booking, LocalDateTime now, List<Booking> filteredBookings) {
+        if (booking.getStart().isBefore(now) && booking.getEnd().isAfter(now)) {
+            booking.setBookingTimeState(BookingTimeState.CURRENT);
+            filteredBookings.add(booking);
+        }
+    }
+
+    private void filterPastBookings(Booking booking, LocalDateTime now, List<Booking> filteredBookings) {
+        if (booking.getEnd().isBefore(now)) {
+            booking.setBookingTimeState(BookingTimeState.PAST);
+            filteredBookings.add(booking);
+        }
+    }
+
+    private void filterFutureBookings(Booking booking, LocalDateTime now, List<Booking> filteredBookings) {
+        if (booking.getStart().isAfter(now)) {
+            booking.setBookingTimeState(BookingTimeState.FUTURE);
+            filteredBookings.add(booking);
+        }
+    }
+
+    private void validateState(String state) {
+        if (!(state.equalsIgnoreCase("WAITING")
+                || state.equalsIgnoreCase("APPROVED")
+                || state.equalsIgnoreCase("REJECTED")
+                || state.equalsIgnoreCase("CANCELED")
+                || state.equalsIgnoreCase("ALL")
+                || state.equalsIgnoreCase("CURRENT")
+                || state.equalsIgnoreCase("PAST")
+                || state.equalsIgnoreCase("FUTURE")
+                || state.equalsIgnoreCase(""))) {
+            throw new IllegalArgumentException("Unknown state: " + state);
+        }
     }
 
 }

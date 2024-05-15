@@ -32,14 +32,13 @@ public class UserServiceImpl implements UserService {
     public User update(Integer userID, User updatedUser) {
 
         User user = userRepository.findById(userID)
-                .orElseThrow(() -> new EntityNotFoundException(User.class,
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userID),
                         "Пользователь с id " + userID + " не найден."));
 
-        if (!Objects.equals(user.getEmail(), updatedUser.getEmail())) {
-            if (userRepository.findByEmail(updatedUser.getEmail()) != null) {
-                throw new EntityAlreadyExistsException(User.class,
+        if (!Objects.equals(user.getEmail(), updatedUser.getEmail()) &&
+                userRepository.findByEmail(updatedUser.getEmail()) != null) {
+            throw new EntityAlreadyExistsException(User.class,
                         "Пользователь с email '" + updatedUser.getEmail() + "' уже существует.");
-            }
         }
 
         if (updatedUser.getName() != null) {
@@ -64,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findById(Integer userId) {
         Optional<User> user = userRepository.findById(userId);
-        return user.orElseThrow(() -> new EntityNotFoundException(User.class,
+        return user.orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                 "Пользователь с id " + userId + " не найден."));
     }
 
