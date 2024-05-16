@@ -1,26 +1,40 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 
-@Data
+@DynamicUpdate
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
+@Builder
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @NotBlank
     @Email
+    @Column(name = "email", nullable = false)
     private String email;
 
     public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public User(Integer id, String name, String email) {
+        this.id = id;
         this.name = name;
         this.email = email;
     }

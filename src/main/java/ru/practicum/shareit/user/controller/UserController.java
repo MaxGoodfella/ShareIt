@@ -1,13 +1,12 @@
 package ru.practicum.shareit.user.controller;
 
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 
@@ -20,7 +19,7 @@ public class UserController {
     private final UserService userService;
 
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public User save(@Valid @RequestBody User newUser) {
         log.info("Start saving user {}", newUser);
         User savedUser = userService.save(newUser);
@@ -36,7 +35,7 @@ public class UserController {
         return updatedUser;
     }
 
-    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{userId}")
     public User findById(@PathVariable("userId") Integer userID) {
         log.info("Start fetching user with id = {}", userID);
         User fetchedUser = userService.findById(userID);
@@ -44,7 +43,7 @@ public class UserController {
         return fetchedUser;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public List<User> findAll() {
         log.info("Start fetching all users");
         List<User> fetchedUsers = userService.findAll();
@@ -53,11 +52,9 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{userId}")
-    public boolean deleteById(@PathVariable("userId") Integer userID) {
+    public void deleteById(@PathVariable("userId") Integer userID) {
         log.info("Start deleting user with id = {}", userID);
-        boolean isDeleted = userService.deleteById(userID);
-        log.info("Finish deleting user with id = {}", userID);
-        return isDeleted;
+        userService.deleteById(userID);
     }
 
 }

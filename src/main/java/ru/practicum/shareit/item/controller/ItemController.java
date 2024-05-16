@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.controller;
 
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,10 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
+    private static  final String REQUEST_HEADER = "X-Sharer-User-Id";
+
     private final ItemService itemService;
 
-    private final static String REQUEST_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
     public Item add(@RequestHeader(REQUEST_HEADER) Integer userId,
@@ -41,17 +43,18 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public Item getItemByItemId(@PathVariable Integer itemId) {
+    public ItemDtoOut getItemByItemId(@RequestHeader(REQUEST_HEADER) Integer userId,
+                                      @PathVariable Integer itemId) {
         log.info("Start fetching item with id = {}", itemId);
-        Item fetchedItem = itemService.getItem(itemId);
+        ItemDtoOut fetchedItem = itemService.getItem(userId, itemId);
         log.info("Finish fetching item with id = {}", fetchedItem.getId());
         return fetchedItem;
     }
 
     @GetMapping
-    public List<Item> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
+    public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
         log.info("Start fetching items for user with id = {}", userId);
-        List<Item> fetchedItems = itemService.getItems(userId);
+        List<ItemDtoOut> fetchedItems = itemService.getItems(userId);
         log.info("Finish fetching items for user with id = {}", userId);
         return fetchedItems;
     }
@@ -62,6 +65,16 @@ public class ItemController {
         List<Item> fetchedItems = itemService.search(text);
         log.info("Finish fetching items by name/description using 'text' parameter = {}", text);
         return fetchedItems;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public ItemDto.ItemCommentDto  addComment(@RequestHeader(REQUEST_HEADER) Integer userId,
+                              @PathVariable("itemId") Integer itemId,
+                              @RequestBody ItemDto.ItemCommentDto comment) {
+        log.info("Start adding comment {} to item with id = {}", comment, itemId);
+        ItemDto.ItemCommentDto  addedComment = itemService.addComment(userId, itemId, comment);
+        log.info("Finish adding comment {} to item with id = {}", addedComment, itemId);
+        return addedComment;
     }
 
 }
