@@ -52,9 +52,11 @@ public class BookingController {
 
     @GetMapping
     public List<Booking> getBookingsSentByUserId(@RequestHeader(REQUEST_HEADER) Integer userId,
-                                             @RequestParam(value = "state", defaultValue = "ALL") String state) {
+                                             @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                 @RequestParam(required = false, defaultValue = "100") Integer size) {
         log.info("Start fetching bookings with state '{}' from user with id = {}", userId, state);
-        List<Booking> fetchedBookings = bookingService.getBookingsSent(userId, state.toUpperCase());
+        List<Booking> fetchedBookings = bookingService.getBookingsSent(userId, state.toUpperCase(), from, size);
         log.info("Finish fetching bookings with state '{}' from user with id = {}", userId, state);
         return fetchedBookings;
 
@@ -62,9 +64,11 @@ public class BookingController {
 
     @GetMapping("/owner")
     public List<Booking> getBookingsReceivedByUserId(@RequestHeader(REQUEST_HEADER) Integer userId,
-                                                 @RequestParam(value = "state", defaultValue = "ALL") String state) {
+                                                 @RequestParam(value = "state", defaultValue = "ALL") String state,
+                                                     @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                     @RequestParam(required = false, defaultValue = "100") Integer size) {
         log.info("Start fetching bookings with state '{}' for user with id = {}", userId, state);
-        List<Booking> fetchedBookings = bookingService.getBookingsReceived(userId, state.toUpperCase());
+        List<Booking> fetchedBookings = bookingService.getBookingsReceived(userId, state.toUpperCase(), from, size);
         log.info("Finish fetching bookings with state '{}' for user with id = {}", userId, state);
         return fetchedBookings;
 

@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.model;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -31,5 +32,11 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
+
+//    @ManyToOne(fetch = FetchType.EAGER)
+//    private Request request;
+
+    @Column(name = "request_id")
+    private Integer requestId;
 
 }

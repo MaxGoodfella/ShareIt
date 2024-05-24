@@ -51,13 +51,14 @@ public class ItemController {
         return fetchedItem;
     }
 
-    @GetMapping
-    public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
-        log.info("Start fetching items for user with id = {}", userId);
-        List<ItemDtoOut> fetchedItems = itemService.getItems(userId);
-        log.info("Finish fetching items for user with id = {}", userId);
-        return fetchedItems;
-    }
+
+//    @GetMapping
+//    public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId) {
+//        log.info("Start fetching items for user with id = {}", userId);
+//        List<ItemDtoOut> fetchedItems = itemService.getItems(userId);
+//        log.info("Finish fetching items for user with id = {}", userId);
+//        return fetchedItems;
+//    }
 
     @GetMapping("/search")
     public List<Item> search(@RequestParam(required = false) String text) {
@@ -66,6 +67,27 @@ public class ItemController {
         log.info("Finish fetching items by name/description using 'text' parameter = {}", text);
         return fetchedItems;
     }
+
+
+    @GetMapping
+    public List<ItemDtoOut> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Integer userId,
+                                             @RequestParam(required = false, defaultValue = "0") Integer from,
+                                             @RequestParam(required = false, defaultValue = "100") Integer size) {
+        log.info("Start fetching items for user with id = {}", userId);
+        List<ItemDtoOut> fetchedItems = itemService.getItems(userId, from, size);
+        log.info("Finish fetching items for user with id = {}", userId);
+        return fetchedItems;
+    }
+
+//    @GetMapping("/search")
+//    public List<Item> search(@RequestParam(required = false) String text,
+//                             @RequestParam(required = false, defaultValue = "0") int from,
+//                             @RequestParam(required = false) int size) {
+//        log.info("Start fetching items by name/description using 'text' parameter = {}", text);
+//        List<Item> fetchedItems = itemService.search(text, from, size);
+//        log.info("Finish fetching items by name/description using 'text' parameter = {}", text);
+//        return fetchedItems;
+//    }
 
     @PostMapping("/{itemId}/comment")
     public ItemDto.ItemCommentDto  addComment(@RequestHeader(REQUEST_HEADER) Integer userId,

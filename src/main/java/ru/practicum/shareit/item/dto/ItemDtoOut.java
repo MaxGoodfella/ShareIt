@@ -28,6 +28,8 @@ public class ItemDtoOut {
 
     private BookingDtoOut nextBooking;
 
+    private Integer requestId;
+
 
     public ItemDtoOut(Integer id, String name, String description, Boolean available) {
         this.id = id;

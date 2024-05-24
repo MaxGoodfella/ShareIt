@@ -2,7 +2,12 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -33,6 +38,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final JpaItemRepository itemRepository;
@@ -47,6 +53,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
+    @Transactional
     public Item add(Integer userId, ItemDto itemDto) {
 
         User user = userRepository.findById(userId)
@@ -68,6 +75,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Item update(Integer userId, Integer itemId, ItemDto itemDto) {
 
         userRepository.findById(userId)
@@ -126,14 +134,52 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
+//    @Override
+//    public List<ItemDtoOut> getItems(Integer userId) {
+//
+//        userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
+//                        "Пользователь с id " + userId + " не найден."));
+//
+//        List<Item> itemList = itemRepository.findByOwnerId(userId);
+//        List<Integer> idList = itemList.stream()
+//                .map(Item::getId)
+//                .collect(Collectors.toList());
+//        Map<Integer, List<CommentDtoOut>> comments = commentRepository.findAllByItemIdIn(idList)
+//                .stream()
+//                .map(CommentMapper::toCommentDtoOut)
+//                .collect(groupingBy(CommentDtoOut::getItemId, toList()));
+//
+//        Map<Integer, List<BookingDtoOut>> bookings = bookingRepository.findAllByItemInAndStatusOrderByStartAsc(itemList,
+//                        BookingState.APPROVED)
+//                .stream()
+//                .map(BookingMapper::toBookingOut)
+//                .collect(groupingBy(BookingDtoOut::getItemId, toList()));
+//
+//        return itemList.stream()
+//                .sorted(Comparator.comparingInt(Item::getId))
+//                .map(item -> ItemMapper.toItemDtoOut(
+//                        item,
+//                        getLastBooking(bookings.get(item.getId()), LocalDateTime.now()),
+//                        comments.get(item.getId()),
+//                        getNextBooking(bookings.get(item.getId()), LocalDateTime.now())
+//                ))
+//                .collect(Collectors.toList());
+//
+//    }
+
     @Override
-    public List<ItemDtoOut> getItems(Integer userId) {
+    public List<ItemDtoOut> getItems(Integer userId, Integer from, Integer size) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        List<Item> itemList = itemRepository.findByOwnerId(userId);
+        validateSearchParameters(from, size);
+
+        Pageable page = PageRequest.of(from / size, size);
+
+        List<Item> itemList = itemRepository.findByOwnerId(userId, page);
         List<Integer> idList = itemList.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
@@ -160,6 +206,53 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
+
+//    @Override
+//    public List<ItemDtoOut> getItems(Integer userId, Integer from, Integer size) {
+//
+//        validateSearchParameters(from, size);
+//
+//        Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
+//
+//        userRepository.findById(userId)
+//                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
+//                        "Пользователь с id " + userId + " не найден."));
+//
+//        Page<Item> itemPage = itemRepository.findByOwnerId(userId, pageable);
+//        List<Item> itemList = itemPage.getContent();
+//
+//        if (itemList.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//
+//        List<Integer> idList = itemList.stream()
+//                .map(Item::getId)
+//                .collect(Collectors.toList());
+//        Map<Integer, List<CommentDtoOut>> comments = commentRepository.findAllByItemIdIn(idList)
+//                .stream()
+//                .map(CommentMapper::toCommentDtoOut)
+//                .collect(Collectors.groupingBy(CommentDtoOut::getItemId, Collectors.toList()));
+//
+//
+//        Map<Integer, List<BookingDtoOut>> bookings = bookingRepository.findAllByItemInAndStatusOrderByStartAsc(itemList,
+//                        BookingState.APPROVED)
+//                .stream()
+//                .map(BookingMapper::toBookingOut)
+//                .collect(Collectors.groupingBy(BookingDtoOut::getItemId, Collectors.toList()));
+//
+//        // Преобразование предметов в DTO
+//        return itemList.stream()
+//                .map(item -> ItemMapper.toItemDtoOut(
+//                        item,
+//                        getLastBooking(bookings.get(item.getId()), LocalDateTime.now()),
+//                        comments.get(item.getId()),
+//                        getNextBooking(bookings.get(item.getId()), LocalDateTime.now())
+//                ))
+//                .collect(Collectors.toList());
+//    }
+
+
     @Override
     public List<Item> search(String text) {
 
@@ -171,7 +264,23 @@ public class ItemServiceImpl implements ItemService {
 
     }
 
+//    @Override
+//    public List<Item> search(String text, Integer from, Integer size) {
+//        validateSearchParameters(from, size);
+//
+//        Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
+//
+//        if (text == null || text.isBlank() || text.isEmpty()) {
+//            return Collections.emptyList();
+//        }
+//
+//        Page<Item> itemPage = itemRepository.searchByNameAndDescription(text.toLowerCase(), pageable);
+//        return itemPage.getContent();
+//    }
+
+
     @Override
+    @Transactional
     public ItemDto.ItemCommentDto addComment(Integer userId, Integer itemId, ItemDto.ItemCommentDto commentDto) {
 
         User user = userRepository.findById(userId)
@@ -246,6 +355,22 @@ public class ItemServiceImpl implements ItemService {
                 .filter(bookingDTO -> bookingDTO.getStart().isAfter(time))
                 .findFirst()
                 .orElse(null);
+    }
+
+
+
+    private void validateSearchParameters(Integer from, Integer size) {
+
+        if (from == 0 && size == 0 ) {
+            throw new BadRequestException(Integer.class, from + " & " + size,
+                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
+        }
+
+        if (from < 0 || size < 0) {
+            throw new BadRequestException(Integer.class, from + " & " + size,
+                    "Некорректные параметры поиска: from = " + from + " или " + " size = " + size);
+        }
+
     }
 
 }

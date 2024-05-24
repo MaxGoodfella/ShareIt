@@ -14,10 +14,17 @@ public interface ItemService {
 
     ItemDtoOut getItem(Integer userId, Integer itemId);
 
-    List<ItemDtoOut> getItems(Integer userId);
+    List<ItemDtoOut> getItems(Integer userId, Integer from, Integer size);
 
     List<Item> search(String text);
 
+
+
+//    List<ItemDtoOut> getItems(Integer userId, Integer from, Integer size);
+//    List<Item> search(String text, Integer from, Integer size);
+
+
     ItemDto.ItemCommentDto addComment(Integer userId, Integer itemId, ItemDto.ItemCommentDto comment);
+
 
 }

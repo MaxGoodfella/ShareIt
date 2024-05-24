@@ -30,6 +30,8 @@ public class ItemDto {
 
     private List<ItemCommentDto> comments;
 
+    private Integer requestId;
+
 
     @Getter
     @Setter
