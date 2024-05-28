@@ -260,7 +260,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void validateSearchParameters(Integer from, Integer size) {
 
-        if (from == 0 && size == 0 ) {
+        if (from == 0 && size == 0) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }

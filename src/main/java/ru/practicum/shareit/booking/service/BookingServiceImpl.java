@@ -241,7 +241,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateSearchParameters(int from, int size) {
-        if (from == 0 && size == 0 ) {
+        if (from == 0 && size == 0) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
