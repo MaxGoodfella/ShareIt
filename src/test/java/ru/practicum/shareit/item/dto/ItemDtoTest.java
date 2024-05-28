@@ -7,6 +7,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -17,11 +18,11 @@ class ItemDtoTest {
     @Autowired
     private JacksonTester<ItemDto> json;
 
-
     @Test
     void testItemDto() throws Exception {
 
         LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         ItemDto.ItemBookingDto itemBookingDto1 = ItemDto.ItemBookingDto.builder()
                 .id(1)
@@ -51,23 +52,21 @@ class ItemDtoTest {
         JsonContent<ItemDto> result = json.write(itemDto);
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
-
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("name");
-
         assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("description");
 
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.start")
-                .isEqualTo(now.minusDays(2).toString().substring(0, 19));
+                .isEqualTo(now.minusDays(2).format(formatter));
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.end")
-                .isEqualTo(now.minusDays(1).toString().substring(0, 19));
+                .isEqualTo(now.minusDays(1).format(formatter));
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.start")
-                .isEqualTo(now.plusDays(1).toString().substring(0, 19));
+                .isEqualTo(now.plusDays(1).format(formatter));
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.end")
-                .isEqualTo(now.plusDays(2).toString().substring(0, 19));
+                .isEqualTo(now.plusDays(2).format(formatter));
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathArrayValue("$.comments").isEmpty();
