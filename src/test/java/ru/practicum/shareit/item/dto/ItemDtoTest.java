@@ -58,16 +58,16 @@ class ItemDtoTest {
 
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.start")
-                .isEqualTo(now.minusDays(2).toString());
+                .isEqualTo(now.minusDays(2).toString().substring(0, 19));
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.end")
-                .isEqualTo(now.minusDays(1).toString());
+                .isEqualTo(now.minusDays(1).toString().substring(0, 19));
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.start")
-                .isEqualTo(now.plusDays(1).toString());
+                .isEqualTo(now.plusDays(1).toString().substring(0, 19));
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.end")
-                .isEqualTo(now.plusDays(2).toString());
+                .isEqualTo(now.plusDays(2).toString().substring(0, 19));
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathArrayValue("$.comments").isEmpty();
