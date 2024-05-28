@@ -21,20 +21,19 @@ class ItemDtoTest {
     @Test
     void testItemDto() throws Exception {
 
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now().withNano(0);
 
         ItemDto.ItemBookingDto itemBookingDto1 = ItemDto.ItemBookingDto.builder()
                 .id(1)
-                .start(now.minusDays(2))
-                .end(now.minusDays(1))
+                .start(now.minusDays(2).withNano(0))
+                .end(now.minusDays(1).withNano(0))
                 .bookerId(1)
                 .build();
 
         ItemDto.ItemBookingDto itemBookingDto2 = ItemDto.ItemBookingDto.builder()
                 .id(1)
-                .start(now.plusDays(1))
-                .end(now.plusDays(2))
+                .start(now.plusDays(1).withNano(0))
+                .end(now.plusDays(2).withNano(0))
                 .bookerId(1)
                 .build();
 
@@ -57,22 +56,21 @@ class ItemDtoTest {
 
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.start")
-                .isEqualTo(now.minusDays(2).format(formatter));
+                .isEqualTo(now.minusDays(2).withNano(0).toString());
         assertThat(result).extractingJsonPathStringValue("$.lastBooking.end")
-                .isEqualTo(now.minusDays(1).format(formatter));
+                .isEqualTo(now.minusDays(1).withNano(0).toString());
         assertThat(result).extractingJsonPathNumberValue("$.lastBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.start")
-                .isEqualTo(now.plusDays(1).format(formatter));
+                .isEqualTo(now.plusDays(1).withNano(0).toString());
         assertThat(result).extractingJsonPathStringValue("$.nextBooking.end")
-                .isEqualTo(now.plusDays(2).format(formatter));
+                .isEqualTo(now.plusDays(2).withNano(0).toString());
         assertThat(result).extractingJsonPathNumberValue("$.nextBooking.bookerId").isEqualTo(1);
 
         assertThat(result).extractingJsonPathArrayValue("$.comments").isEmpty();
 
         assertThat(result).extractingJsonPathNumberValue("$.requestId").isEqualTo(1);
-
     }
 
 }
