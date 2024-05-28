@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "comments")
 public class Comment {
 

@@ -130,28 +130,6 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
-//    @Override
-//    public List<Booking> getBookingsSent(Integer userId, String state) {
-//        userRepository.findById(userId)
-//                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
-//                        "Пользователь с id " + userId + " не найден."));
-//
-//        List<Booking> bookings = bookingRepository.findBookingsByBooker_Id(userId);
-//        return filterBookingsByState(bookings, state);
-//    }
-//
-//    @Override
-//    public List<Booking> getBookingsReceived(Integer userId, String state) {
-//       userRepository.findById(userId)
-//                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
-//                        "Пользователь с id " + userId + " не найден."));
-//
-//        List<Booking> bookings = bookingRepository.findBookingsByItem_Owner_Id(userId);
-//        return filterBookingsByState(bookings, state);
-//    }
-
-
-
     @Override
     public List<Booking> getBookingsSent(Integer userId, String state, Integer from, Integer size) {
 
@@ -164,6 +142,7 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         Page<Booking> bookingPage = bookingRepository.findBookingsByBooker_Id(userId, pageable);
         return filterBookingsByState(bookingPage.getContent(), state);
+
     }
 
     @Override
@@ -178,10 +157,8 @@ public class BookingServiceImpl implements BookingService {
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         Page<Booking> bookingPage = bookingRepository.findBookingsByItem_Owner_Id(userId, pageable);
         return filterBookingsByState(bookingPage.getContent(), state);
+
     }
-
-
-
 
 
     private List<Booking> filterBookingsByState(List<Booking> bookings, String state) {
@@ -264,7 +241,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void validateSearchParameters(int from, int size) {
-
         if (from == 0 && size == 0 ) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
@@ -274,7 +250,6 @@ public class BookingServiceImpl implements BookingService {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
-
     }
 
 }

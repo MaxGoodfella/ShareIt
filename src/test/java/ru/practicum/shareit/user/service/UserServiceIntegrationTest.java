@@ -1,28 +1,20 @@
 package ru.practicum.shareit.user.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.JpaUserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -31,14 +23,13 @@ import static org.junit.jupiter.api.Assertions.*;
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class UserServiceIntegrationTest {
 
-
     private final EntityManager em;
+
     private final UserService service;
 
 
     @Test
     void save() {
-
         User user = new User(1, "username", "user@email.com");
 
         service.save(user);
@@ -50,7 +41,6 @@ class UserServiceIntegrationTest {
         assertThat(savedUser.getId(), notNullValue());
         assertThat(savedUser.getName(), equalTo(user.getName()));
         assertThat(savedUser.getEmail(), equalTo(user.getEmail()));
-
     }
 
     @Test
@@ -72,7 +62,6 @@ class UserServiceIntegrationTest {
 
     @Test
     void findById() {
-
         User sourceUser = new User("username", "user@email.com");
 
         em.persist(sourceUser);
@@ -83,12 +72,10 @@ class UserServiceIntegrationTest {
         assertThat(targetUser, notNullValue());
         assertThat(targetUser.getName(), equalTo(sourceUser.getName()));
         assertThat(targetUser.getEmail(), equalTo(sourceUser.getEmail()));
-
     }
 
     @Test
     void findAll() {
-
         List<User> sourceUsers = List.of(
                 new User("Ivan", "ivan@email"),
                 new User("Petr", "petr@email"),
@@ -110,7 +97,6 @@ class UserServiceIntegrationTest {
                     hasProperty("email", equalTo(sourceUser.getEmail()))
             )));
         }
-
     }
 
     @Test

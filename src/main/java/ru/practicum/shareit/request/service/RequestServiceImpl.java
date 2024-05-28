@@ -49,7 +49,6 @@ public class RequestServiceImpl implements RequestService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-
         Request newRequest = modelMapper.map(requestDto, Request.class);
 
         newRequest.setCreated(LocalDateTime.now());
@@ -91,7 +90,6 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestDto getRequest(Integer requestId, Integer userId) {
 
-
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
@@ -112,89 +110,6 @@ public class RequestServiceImpl implements RequestService {
 
     }
 
-//    @Override
-//    public List<RequestDto> getRequests(int from, int size) {
-//
-//        validateSearchParameters(from, size);
-//
-//        List<Request> allRequests = requestRepository.findAll();
-//        allRequests.sort(Comparator.comparing(Request::getCreated).reversed());
-//
-//
-//        int startIndex = Math.min(from, allRequests.size());
-//        int endIndex = Math.min(from + size, allRequests.size());
-//
-//        List<Request> paginatedRequests = allRequests.subList(startIndex, endIndex);
-//
-//
-//        List<Integer> idList = paginatedRequests.stream()
-//                .map(Request::getId)
-//                .collect(Collectors.toList());
-//
-//        Map<Integer, List<RequestDto.RequestItemDto>> items = itemRepository.findAllByRequestIdIn(idList)
-//                .stream()
-//                .map(ItemMapper::toRequestItemDto)
-//                .collect(Collectors.groupingBy(RequestDto.RequestItemDto::getRequest_id));
-//
-//        return paginatedRequests.stream()
-//                .map(request -> {
-//                    RequestDto requestDto = modelMapper.map(request, RequestDto.class);
-//                    requestDto.setItems(items.getOrDefault(request.getId(), Collections.emptyList()));
-//                    return requestDto;
-//                })
-//                .collect(Collectors.toList());
-//    }
-
-
-//    @Override
-//    public List<RequestDto> getRequests(int from, int size) {
-//
-//        validateSearchParameters(from, size);
-//
-//        // Pageable sortedByCreated = PageRequest.of(from, size, Sort.by("created").descending());
-//
-////        Pageable sortedByCreated = FromSizeRequest.of(from, size, true);
-//
-////        int page = from / size; // Calculate page number from the 'from' parameter
-////        Pageable sortedByCreated = PageRequest.of(page, size, Sort.by("created").descending());
-//
-////        boolean newestFirst = Sort.by("created").descending();
-//
-//        final PageRequest pageRequest = PageRequest.of(from / size, size, Sort.by("created").descending());
-//
-//        // Page<Request> requestPage = requestRepository.findAll(sortedByCreated);
-//
-//        Page<Request> requestPage = requestRepository.findAll(pageRequest);
-//
-//
-//        List<Request> requestList = requestPage.getContent();
-//
-//
-//        if (requestList.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//
-//
-//        List<Integer> idList = requestList.stream()
-//                .map(Request::getId)
-//                .collect(Collectors.toList());
-//
-//        Map<Integer, List<RequestDto.RequestItemDto>> items = itemRepository.findAllByRequestIdIn(idList)
-//                .stream()
-//                .map(ItemMapper::toRequestItemDto)
-//                .collect(Collectors.groupingBy(RequestDto.RequestItemDto::getRequest_id));
-//
-//        return requestList.stream()
-//                .map(request -> {
-//                    RequestDto requestDto = modelMapper.map(request, RequestDto.class);
-//                    requestDto.setItems(items.getOrDefault(request.getId(), Collections.emptyList()));
-//                    return requestDto;
-//                })
-//                .collect(Collectors.toList());
-//
-//    }
-
-
     @Override
     public List<RequestDto> getRequests(Integer from, Integer size, Integer userId) {
 
@@ -205,8 +120,6 @@ public class RequestServiceImpl implements RequestService {
         validateSearchParameters(from, size);
 
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
-
-        // Page<Request> requestPage = requestRepository.findAll(pageable);
 
         Page<Request> requestPage = requestRepository.findAllByRequestorIdNot(userId, pageable);
 
@@ -232,11 +145,8 @@ public class RequestServiceImpl implements RequestService {
                     return requestDto;
                 })
                 .collect(Collectors.toList());
+
     }
-
-
-
-
 
 
     private void validateSearchParameters(Integer from, Integer size) {
@@ -252,6 +162,5 @@ public class RequestServiceImpl implements RequestService {
         }
 
     }
-
 
 }

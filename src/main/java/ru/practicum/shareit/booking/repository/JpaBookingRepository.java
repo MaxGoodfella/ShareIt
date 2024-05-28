@@ -11,20 +11,14 @@ import java.util.List;
 
 public interface JpaBookingRepository extends JpaRepository<Booking, Integer> {
 
-    List<Booking> findBookingsByBooker_Id(Integer userId);
-
-    List<Booking> findBookingsByItem_Owner_Id(Integer userId);
-
     List<Booking> findByItemIdAndBookerId(Integer itemId, Integer userId);
 
     List<Booking> findAllByItemAndStatusOrderByStartAsc(Item item, BookingState status);
 
     List<Booking> findAllByItemInAndStatusOrderByStartAsc(List<Item> items, BookingState status);
 
-        Page<Booking> findBookingsByBooker_Id(Integer userId, Pageable pageable);
+    Page<Booking> findBookingsByBooker_Id(Integer userId, Pageable pageable);
 
-        Page<Booking> findBookingsByItem_Owner_Id(Integer userId, Pageable pageable);
-
-
+    Page<Booking> findBookingsByItem_Owner_Id(Integer userId, Pageable pageable);
 
 }

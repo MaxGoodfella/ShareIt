@@ -7,7 +7,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @JsonTest
 class UserDtoTest {
@@ -15,8 +14,10 @@ class UserDtoTest {
     @Autowired
     JacksonTester<UserDto> json;
 
+
     @Test
     void testUserDto() throws Exception {
+
         UserDto userDto = UserDto
                 .builder()
                 .id(1)
@@ -29,6 +30,7 @@ class UserDtoTest {
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("user");
         assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("user@email.com");
+
     }
 
 }

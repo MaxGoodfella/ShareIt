@@ -37,8 +37,6 @@ class UserControllerIntegrationTest {
 
     private final User user = new User(1, "username", "user@email.com");
 
-    User badUser = new User("username", null);
-
 
     @SneakyThrows
     @Test
@@ -98,7 +96,6 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$[0].email", is(user.getEmail())));
 
     }
-
 
     @SneakyThrows
     @Test

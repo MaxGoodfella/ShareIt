@@ -19,12 +19,14 @@ class JpaUserRepositoryIntegrationTest {
 
     @BeforeEach
     public void addUsers() {
-        userRepository.save(User.builder()
-                        .name("user1")
-                        .email("user1@email.com")
+        userRepository.save(User
+                .builder()
+                .name("user1")
+                .email("user1@email.com")
                 .build());
 
-        userRepository.save(User.builder()
+        userRepository.save(User
+                .builder()
                 .name("user2")
                 .email("user2@email.com")
                 .build());

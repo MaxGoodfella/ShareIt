@@ -74,7 +74,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteById(Integer userID) {
-
         userRepository.findById(userID)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userID),
                         "Пользователь с id " + userID + " не найден."));

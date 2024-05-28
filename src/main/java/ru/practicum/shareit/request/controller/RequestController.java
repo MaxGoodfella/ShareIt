@@ -3,7 +3,6 @@ package ru.practicum.shareit.request.controller;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.service.RequestService;
@@ -21,6 +20,7 @@ public class RequestController {
     private static  final String REQUEST_HEADER = "X-Sharer-User-Id";
 
     private final RequestService requestService;
+
 
     @PostMapping
     public Request add(@RequestHeader(REQUEST_HEADER) Integer userId,
@@ -57,6 +57,5 @@ public class RequestController {
         log.info("Start fetching requests using 'from' parameter = {} and 'size' parameter = {}", from, size);
         return fetchedRequests;
     }
-
 
 }

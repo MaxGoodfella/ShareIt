@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
+@Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,6 +34,7 @@ public class ItemDto {
     private Integer requestId;
 
 
+    @Builder
     @Getter
     @Setter
     @AllArgsConstructor
@@ -48,9 +50,11 @@ public class ItemDto {
 
     }
 
+    @Builder
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ItemCommentDto {
 
         Integer id;
