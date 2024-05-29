@@ -116,7 +116,9 @@ public class ItemServiceImpl implements ItemService {
         ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
         itemDtoOut.setComments(getAllItemComments(itemId));
 
-        if (!item.getOwner().getId().equals(userId)) {
+        Integer ownerId = item.getOwner().getId();
+
+        if (!ownerId.equals(userId)) {
             return itemDtoOut;
         }
 
@@ -265,7 +267,7 @@ public class ItemServiceImpl implements ItemService {
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
 
-        if (from < 0 || size < 0) {
+        if (from < 0 || size <= 0) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " или " + " size = " + size);
         }

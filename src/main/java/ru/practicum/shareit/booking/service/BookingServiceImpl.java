@@ -55,9 +55,13 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException(Item.class, String.valueOf(bookingDto.getItemId()),
                         "Предмет с id " + bookingDto.getItemId() + " не найден."));
 
-        if (item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
-                    "Пользователь с id = " + userId + " не может забронировать свой же предмет");
+        Integer ownerId = item.getOwner().getId();
+
+        if (ownerId != null) {
+            if (ownerId.equals(userId)) {
+                throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
+                        "Пользователь с id = " + userId + " не может забронировать свой же предмет");
+            }
         }
 
         if (!item.getAvailable()) {
@@ -90,9 +94,13 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = booking.getItem();
 
-        if (!item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
-                    "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
+        Integer ownerId = item.getOwner().getId();
+
+        if (ownerId != null) {
+            if (!ownerId.equals(userId)) {
+                throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
+                        "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
+            }
         }
 
         if (booking.getStatus().equals(BookingState.APPROVED)) {
@@ -121,9 +129,14 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
-            throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
-                    "Бронирование с id " + bookingId + " не найдено.");
+        Integer bookerId = booking.getBooker().getId();
+        Integer ownerId = booking.getItem().getOwner().getId();
+
+        if (bookerId != null && ownerId != null) {
+            if (!(bookerId.equals(userId) || ownerId.equals(userId))) {
+                throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
+                        "Бронирование с id " + bookingId + " не найдено.");
+            }
         }
 
         return booking;
@@ -246,7 +259,7 @@ public class BookingServiceImpl implements BookingService {
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
 
-        if (from < 0 || size < 0) {
+        if (from < 0 || size <= 0) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }

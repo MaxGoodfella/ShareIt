@@ -156,7 +156,7 @@ public class RequestServiceImpl implements RequestService {
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
 
-        if (from < 0 || size < 0) {
+        if (from < 0 || size <= 0) {
             throw new BadRequestException(Integer.class, from + " & " + size,
                     "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }

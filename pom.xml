@@ -130,9 +130,9 @@
                 <configuration>
                     <source>11</source>
                     <target>11</target>
-					<compilerArgs>
-						<arg>--enable-preview</arg>
-					</compilerArgs>
+<!--					<compilerArgs>-->
+<!--						<arg>&#45;&#45;enable-preview</arg>-->
+<!--					</compilerArgs>-->
                 </configuration>
             </plugin>
         </plugins>
@@ -146,7 +146,7 @@
 						<systemPropertyVariables>
 							<spring.profiles.active>test</spring.profiles.active>
 						</systemPropertyVariables>
-						<argLine>--enable-preview</argLine>
+<!--						<argLine>&#45;&#45;enable-preview</argLine>-->
 					</configuration>
 				</plugin>
 				<plugin>
