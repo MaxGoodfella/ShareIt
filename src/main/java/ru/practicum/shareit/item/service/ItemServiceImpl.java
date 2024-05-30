@@ -2,7 +2,10 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -21,11 +24,16 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaCommentRepository;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -33,6 +41,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final JpaItemRepository itemRepository;
@@ -45,8 +54,11 @@ public class ItemServiceImpl implements ItemService {
 
     private final ModelMapper modelMapper;
 
+    private final PaginationValidator paginationValidator;
+
 
     @Override
+    @Transactional
     public Item add(Integer userId, ItemDto itemDto) {
 
         User user = userRepository.findById(userId)
@@ -68,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public Item update(Integer userId, Integer itemId, ItemDto itemDto) {
 
         userRepository.findById(userId)
@@ -110,7 +123,9 @@ public class ItemServiceImpl implements ItemService {
         ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
         itemDtoOut.setComments(getAllItemComments(itemId));
 
-        if (!item.getOwner().getId().equals(userId)) {
+        Integer ownerId = item.getOwner().getId();
+
+        if (!ownerId.equals(userId)) {
             return itemDtoOut;
         }
 
@@ -127,13 +142,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDtoOut> getItems(Integer userId) {
+    public List<ItemDtoOut> getItems(Integer userId, Integer from, Integer size) {
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        List<Item> itemList = itemRepository.findByOwnerId(userId);
+        paginationValidator.validateSearchParameters(from, size);
+
+        Pageable page = PageRequest.of(from / size, size);
+
+        List<Item> itemList = itemRepository.findByOwnerId(userId, page);
         List<Integer> idList = itemList.stream()
                 .map(Item::getId)
                 .collect(Collectors.toList());
@@ -172,6 +191,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto.ItemCommentDto addComment(Integer userId, Integer itemId, ItemDto.ItemCommentDto commentDto) {
 
         User user = userRepository.findById(userId)
@@ -185,7 +205,6 @@ public class ItemServiceImpl implements ItemService {
         if (commentDto.getText() == null || commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
             throw new IllegalArgumentException("Text cannot be empty");
         }
-
 
         List<Booking> userBookings = bookingRepository.findByItemIdAndBookerId(itemId, userId);
         boolean hasApprovedBooking = false;

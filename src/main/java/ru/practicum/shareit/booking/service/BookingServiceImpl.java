@@ -2,7 +2,12 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -12,6 +17,7 @@ import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
@@ -22,6 +28,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final JpaBookingRepository bookingRepository;
@@ -32,8 +39,11 @@ public class BookingServiceImpl implements BookingService {
 
     private final ModelMapper modelMapper;
 
+    private final PaginationValidator paginationValidator;
+
 
     @Override
+    @Transactional
     public Booking add(Integer userId, BookingDto bookingDto) {
 
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
@@ -48,9 +58,13 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException(Item.class, String.valueOf(bookingDto.getItemId()),
                         "Предмет с id " + bookingDto.getItemId() + " не найден."));
 
-        if (item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
-                    "Пользователь с id = " + userId + " не может забронировать свой же предмет");
+        Integer ownerId = item.getOwner().getId();
+
+        if (ownerId != null) {
+            if (ownerId.equals(userId)) {
+                throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
+                        "Пользователь с id = " + userId + " не может забронировать свой же предмет");
+            }
         }
 
         if (!item.getAvailable()) {
@@ -70,6 +84,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public Booking updateBookingStatus(Integer userId, Integer bookingId, boolean approved) {
 
         userRepository.findById(userId)
@@ -82,9 +97,13 @@ public class BookingServiceImpl implements BookingService {
 
         Item item = booking.getItem();
 
-        if (!item.getOwner().getId().equals(userId)) {
-            throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
-                    "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
+        Integer ownerId = item.getOwner().getId();
+
+        if (ownerId != null) {
+            if (!ownerId.equals(userId)) {
+                throw new EntityNotFoundException(Integer.class, String.valueOf(userId),
+                        "Пользователь с id = " + userId + " не имеет права подтверждать/отклонять данное бронирование.");
+            }
         }
 
         if (booking.getStatus().equals(BookingState.APPROVED)) {
@@ -113,7 +132,10 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        if (!(booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId))) {
+        Integer bookerId = booking.getBooker().getId();
+        Integer ownerId = booking.getItem().getOwner().getId();
+
+        if (bookerId != null && ownerId != null && !bookerId.equals(userId) && !ownerId.equals(userId)) {
             throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
                     "Бронирование с id " + bookingId + " не найдено.");
         }
@@ -123,23 +145,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsSent(Integer userId, String state) {
+    public List<Booking> getBookingsSent(Integer userId, String state, Integer from, Integer size) {
+
+        paginationValidator.validateSearchParameters(from, size);
+
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        List<Booking> bookings = bookingRepository.findBookingsByBooker_Id(userId);
-        return filterBookingsByState(bookings, state);
+        Pageable pageable = PageRequest.of(Math.toIntExact(from / size), Math.toIntExact(size), Sort.by("start").descending());
+        Page<Booking> bookingPage = bookingRepository.findBookingsByBooker_Id(userId, pageable);
+        return filterBookingsByState(bookingPage.getContent(), state);
+
     }
 
     @Override
-    public List<Booking> getBookingsReceived(Integer userId, String state) {
-       userRepository.findById(userId)
+    public List<Booking> getBookingsReceived(Integer userId, String state, Integer from, Integer size) {
+
+        paginationValidator.validateSearchParameters(from, size);
+
+        userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        List<Booking> bookings = bookingRepository.findBookingsByItem_Owner_Id(userId);
-        return filterBookingsByState(bookings, state);
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+        Page<Booking> bookingPage = bookingRepository.findBookingsByItem_Owner_Id(userId, pageable);
+        return filterBookingsByState(bookingPage.getContent(), state);
+
     }
 
 

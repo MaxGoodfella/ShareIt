@@ -1,14 +1,17 @@
 package ru.practicum.shareit.item.dto;
 
+//import lombok.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -27,6 +30,8 @@ public class ItemDtoOut {
     private List<CommentDtoOut> comments;
 
     private BookingDtoOut nextBooking;
+
+    private Integer requestId;
 
 
     public ItemDtoOut(Integer id, String name, String description, Boolean available) {

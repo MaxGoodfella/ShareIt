@@ -5,6 +5,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.item.dto.CommentDtoOut;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.dto.RequestDto;
 
 import java.util.List;
 
@@ -29,7 +30,18 @@ public class ItemMapper {
                 item.getAvailable(),
                 lastBooking,
                 comments,
-                nextBooking);
+                nextBooking,
+                item.getRequestId());
+    }
+
+    public RequestDto.RequestItemDto toRequestItemDto(Item item) {
+        return new RequestDto.RequestItemDto(
+                item.getId(),
+                item.getName(),
+                item.getDescription(),
+                item.getAvailable(),
+                item.getRequestId()
+        );
     }
 
 }

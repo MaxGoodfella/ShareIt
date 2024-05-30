@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.EntityAlreadyExistsException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
@@ -14,12 +15,14 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private final JpaUserRepository userRepository;
 
 
     @Override
+    @Transactional
     public User save(User user) {
         if (user.getEmail() == null) {
             throw new IllegalArgumentException("Email cannot be null");
@@ -29,6 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(Integer userID, User updatedUser) {
 
         User user = userRepository.findById(userID)
@@ -68,7 +72,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Integer userID) {
+        userRepository.findById(userID)
+                .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userID),
+                        "Пользователь с id " + userID + " не найден."));
+
         userRepository.deleteById(userID);
     }
 

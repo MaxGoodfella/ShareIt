@@ -1,14 +1,21 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 
-@Data
+@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
@@ -30,7 +37,10 @@ public class ItemDto {
 
     private List<ItemCommentDto> comments;
 
+    private Integer requestId;
 
+
+    @Builder
     @Getter
     @Setter
     @AllArgsConstructor
@@ -46,9 +56,11 @@ public class ItemDto {
 
     }
 
+    @Builder
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class ItemCommentDto {
 
         Integer id;

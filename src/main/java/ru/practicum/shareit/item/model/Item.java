@@ -1,10 +1,23 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
 
 @DynamicUpdate
 @Getter
@@ -12,6 +25,7 @@ import javax.persistence.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "items")
 public class Item {
@@ -31,5 +45,8 @@ public class Item {
 
     @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
+
+    @Column(name = "request_id")
+    private Integer requestId;
 
 }
