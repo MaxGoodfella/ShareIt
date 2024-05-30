@@ -13,6 +13,7 @@ import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.JpaRequestRepository;
@@ -31,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -49,6 +51,9 @@ class RequestServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private PaginationValidator paginationValidator;
 
     @InjectMocks
     private RequestServiceImpl requestService;
@@ -182,6 +187,8 @@ class RequestServiceTest {
     @Test
     void getRequests_InvalidParameters_FromAndSizeZero() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "0", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(eq(0), eq(0));
 
         assertThrows(BadRequestException.class, () -> requestService.getRequests(0, 0, requestor.getId()));
     }
@@ -189,6 +196,8 @@ class RequestServiceTest {
     @Test
     void getRequests_InvalidParameters_FromNegative() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "-1", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(eq(-1), anyInt());
 
         assertThrows(BadRequestException.class, () -> requestService.getRequests(-1, 10, requestor.getId()));
     }
@@ -196,6 +205,8 @@ class RequestServiceTest {
     @Test
     void getRequests_InvalidParameters_SizeNegative() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "-1", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(anyInt(), eq(-1));
 
         assertThrows(BadRequestException.class, () -> requestService.getRequests(0, -1, requestor.getId()));
     }

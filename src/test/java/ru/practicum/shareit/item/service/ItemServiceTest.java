@@ -21,6 +21,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaCommentRepository;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
@@ -38,6 +39,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +61,9 @@ class ItemServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private PaginationValidator paginationValidator;
 
     @InjectMocks
     private ItemServiceImpl itemService;
@@ -203,6 +208,8 @@ class ItemServiceTest {
     @Test
     void getItems_InvalidSearchParameters_FromAndSizeZero() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "0", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(eq(0), eq(0));
 
         assertThrows(BadRequestException.class, () -> itemService.getItems(requestor.getId(), 0, 0));
     }
@@ -210,6 +217,8 @@ class ItemServiceTest {
     @Test
     void getItems_InvalidSearchParameters_FromNegative() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "-1", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(eq(-1), anyInt());
 
         assertThrows(BadRequestException.class, () -> itemService.getItems(requestor.getId(), -1, 10));
     }
@@ -217,6 +226,8 @@ class ItemServiceTest {
     @Test
     void getItems_InvalidSearchParameters_SizeNegative() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(requestor));
+        doThrow(new BadRequestException(Item.class, "-1", "Некорректные параметры пагинации"))
+                .when(paginationValidator).validateSearchParameters(anyInt(), eq(-1));
 
         assertThrows(BadRequestException.class, () -> itemService.getItems(requestor.getId(), 0, -1));
     }

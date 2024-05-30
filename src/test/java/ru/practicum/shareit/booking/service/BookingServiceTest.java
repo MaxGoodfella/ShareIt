@@ -17,6 +17,7 @@ import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
@@ -28,6 +29,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,6 +47,9 @@ class BookingServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+
+    @Mock
+    private PaginationValidator paginationValidator;
 
     @InjectMocks
     private BookingServiceImpl bookingService;
@@ -241,6 +246,7 @@ class BookingServiceTest {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(booker));
         when(bookingRepository.findBookingsByBooker_Id(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
+        doNothing().when(paginationValidator).validateSearchParameters(anyInt(), anyInt());
 
         List<Booking> result = bookingService.getBookingsSent(booker.getId(), "ALL", 0, 10);
 
@@ -251,6 +257,7 @@ class BookingServiceTest {
     @Test
     public void testGetBookingsSent_UserNotFound() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+        doNothing().when(paginationValidator).validateSearchParameters(anyInt(), anyInt());
 
         assertThrows(EntityNotFoundException.class,
                 () -> bookingService.getBookingsSent(booker.getId(), "ALL", 0, 10));
@@ -261,6 +268,7 @@ class BookingServiceTest {
         when(userRepository.findById(anyInt())).thenReturn(Optional.of(owner));
         when(bookingRepository.findBookingsByItem_Owner_Id(anyInt(), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Collections.singletonList(booking)));
+        doNothing().when(paginationValidator).validateSearchParameters(anyInt(), anyInt());
 
         List<Booking> result = bookingService.getBookingsReceived(owner.getId(), "ALL", 0, 10);
 
@@ -271,6 +279,7 @@ class BookingServiceTest {
     @Test
     public void testGetBookingsReceived_UserNotFound() {
         when(userRepository.findById(anyInt())).thenReturn(Optional.empty());
+        doNothing().when(paginationValidator).validateSearchParameters(anyInt(), anyInt());
 
         assertThrows(EntityNotFoundException.class,
                 () -> bookingService.getBookingsReceived(owner.getId(), "ALL", 0, 10));
