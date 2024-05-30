@@ -20,7 +20,7 @@ class CommentDtoOutTest {
     @Test
     void testCommentDto() throws Exception {
 
-        LocalDateTime createdDateTime = LocalDateTime.now();
+        LocalDateTime createdDateTime = LocalDateTime.now().withNano(0);
 
         ItemDtoOut itemDtoOut = ItemDtoOut.builder()
                 .id(1)
@@ -33,7 +33,7 @@ class CommentDtoOutTest {
                 .id(1)
                 .text("text")
                 .authorName("name")
-                .created(createdDateTime)
+                .created(createdDateTime.withNano(0))
                 .itemId(itemDtoOut.getId())
                 .build();
 
@@ -42,7 +42,8 @@ class CommentDtoOutTest {
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.text").isEqualTo("text");
         assertThat(result).extractingJsonPathStringValue("$.authorName").isEqualTo("name");
-        assertThat(result).extractingJsonPathStringValue("$.created").isEqualTo(createdDateTime.toString());
+        assertThat(result).extractingJsonPathStringValue("$.created").isEqualTo(createdDateTime
+                .withNano(0).toString());
         assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
 
     }
