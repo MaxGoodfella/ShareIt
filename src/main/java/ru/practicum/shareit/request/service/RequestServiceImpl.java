@@ -8,10 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.JpaRequestRepository;
@@ -39,6 +39,8 @@ public class RequestServiceImpl implements RequestService {
     private final JpaItemRepository itemRepository;
 
     private final ModelMapper modelMapper;
+
+    private final PaginationValidator paginationValidator;
 
 
     @Override
@@ -117,7 +119,7 @@ public class RequestServiceImpl implements RequestService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        validateSearchParameters(from, size);
+        paginationValidator.validateSearchParameters(from, size);
 
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
 
@@ -145,21 +147,6 @@ public class RequestServiceImpl implements RequestService {
                     return requestDto;
                 })
                 .collect(Collectors.toList());
-
-    }
-
-
-    private void validateSearchParameters(Integer from, Integer size) {
-
-        if (from == 0 && size == 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
-        }
-
-        if (from < 0 || size <= 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
-        }
 
     }
 

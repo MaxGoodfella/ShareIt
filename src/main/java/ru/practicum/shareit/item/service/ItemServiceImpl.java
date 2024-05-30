@@ -24,11 +24,16 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaCommentRepository;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -48,6 +53,8 @@ public class ItemServiceImpl implements ItemService {
     private final JpaCommentRepository commentRepository;
 
     private final ModelMapper modelMapper;
+
+    private final PaginationValidator paginationValidator;
 
 
     @Override
@@ -141,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        validateSearchParameters(from, size);
+        paginationValidator.validateSearchParameters(from, size);
 
         Pageable page = PageRequest.of(from / size, size);
 
@@ -258,20 +265,6 @@ public class ItemServiceImpl implements ItemService {
                 .filter(bookingDTO -> bookingDTO.getStart().isAfter(time))
                 .findFirst()
                 .orElse(null);
-    }
-
-    private void validateSearchParameters(Integer from, Integer size) {
-
-        if (from == 0 && size == 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
-        }
-
-        if (from < 0 || size <= 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " или " + " size = " + size);
-        }
-
     }
 
 }

@@ -17,6 +17,7 @@ import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.JpaItemRepository;
+import ru.practicum.shareit.paginationvalidation.PaginationValidator;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.JpaUserRepository;
 
@@ -37,6 +38,8 @@ public class BookingServiceImpl implements BookingService {
     private final JpaItemRepository itemRepository;
 
     private final ModelMapper modelMapper;
+
+    private final PaginationValidator paginationValidator;
 
 
     @Override
@@ -132,11 +135,9 @@ public class BookingServiceImpl implements BookingService {
         Integer bookerId = booking.getBooker().getId();
         Integer ownerId = booking.getItem().getOwner().getId();
 
-        if (bookerId != null && ownerId != null) {
-            if (!(bookerId.equals(userId) || ownerId.equals(userId))) {
-                throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
-                        "Бронирование с id " + bookingId + " не найдено.");
-            }
+        if (bookerId != null && ownerId != null && !bookerId.equals(userId) && !ownerId.equals(userId)) {
+            throw new EntityNotFoundException(Booking.class, String.valueOf(bookingId),
+                    "Бронирование с id " + bookingId + " не найдено.");
         }
 
         return booking;
@@ -146,13 +147,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsSent(Integer userId, String state, Integer from, Integer size) {
 
-        validateSearchParameters(from, size);
+        paginationValidator.validateSearchParameters(from, size);
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
                         "Пользователь с id " + userId + " не найден."));
 
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
+        Pageable pageable = PageRequest.of(Math.toIntExact(from / size), Math.toIntExact(size), Sort.by("start").descending());
         Page<Booking> bookingPage = bookingRepository.findBookingsByBooker_Id(userId, pageable);
         return filterBookingsByState(bookingPage.getContent(), state);
 
@@ -161,7 +162,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<Booking> getBookingsReceived(Integer userId, String state, Integer from, Integer size) {
 
-        validateSearchParameters(from, size);
+        paginationValidator.validateSearchParameters(from, size);
 
         userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException(User.class, String.valueOf(userId),
@@ -250,18 +251,6 @@ public class BookingServiceImpl implements BookingService {
                 || state.equalsIgnoreCase("FUTURE")
                 || state.equalsIgnoreCase(""))) {
             throw new IllegalArgumentException("Unknown state: " + state);
-        }
-    }
-
-    private void validateSearchParameters(int from, int size) {
-        if (from == 0 && size == 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
-        }
-
-        if (from < 0 || size <= 0) {
-            throw new BadRequestException(Integer.class, from + " & " + size,
-                    "Некорректные параметры поиска: from = " + from + " и " + " size = " + size);
         }
     }
 

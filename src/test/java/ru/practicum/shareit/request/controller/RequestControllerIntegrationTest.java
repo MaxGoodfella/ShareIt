@@ -28,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+
 @WebMvcTest(controllers = RequestController.class)
 class RequestControllerIntegrationTest {
 
@@ -127,6 +128,5 @@ class RequestControllerIntegrationTest {
                         .substring(0, 19))))
                 .andExpect(jsonPath("$[0].items", is(requestDto.getItems())));
     }
-
 
 }
