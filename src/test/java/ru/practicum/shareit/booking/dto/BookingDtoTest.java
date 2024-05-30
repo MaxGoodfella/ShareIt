@@ -23,7 +23,7 @@ class BookingDtoTest {
     @Test
     void testBookingDto() throws Exception {
 
-        LocalDateTime createdDateTime = LocalDateTime.now();
+        LocalDateTime createdDateTime = LocalDateTime.now().withNano(0);
 
         ItemDtoOut itemDtoOut = ItemDtoOut.builder()
                 .id(1)
@@ -34,8 +34,8 @@ class BookingDtoTest {
 
         BookingDto bookingDto = BookingDto.builder()
                 .id(1)
-                .start(createdDateTime.plusDays(1))
-                .end(createdDateTime.plusDays(2))
+                .start(createdDateTime.plusDays(1).withNano(0))
+                .end(createdDateTime.plusDays(2).withNano(0))
                 .itemId(itemDtoOut.getId())
                 .status(BookingState.WAITING)
                 .bookingTimeState(BookingTimeState.ALL)
@@ -45,9 +45,9 @@ class BookingDtoTest {
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo(createdDateTime.plusDays(1)
-                .toString());
+                .withNano(0).toString());
         assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo(createdDateTime.plusDays(2)
-                .toString());
+                .withNano(0).toString());
         assertThat(result).extractingJsonPathNumberValue("$.itemId").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.status").isEqualTo("WAITING");
         assertThat(result).extractingJsonPathStringValue("$.bookingTimeState").isEqualTo("ALL");
