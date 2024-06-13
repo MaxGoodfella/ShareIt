@@ -17,6 +17,8 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 
 @RestController
@@ -60,8 +62,8 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<Object> getItemsByUserId(@RequestHeader(REQUEST_HEADER) Long userId,
-                                                   @RequestParam(required = false, defaultValue = "0") Long from,
-                                                   @RequestParam(required = false, defaultValue = "100") Long size) {
+                                                   @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Long from,
+                                                   @Positive @RequestParam(required = false, defaultValue = "100") Long size) {
         log.info("Start fetching items for user with id = {}", userId);
         ResponseEntity<Object> response = itemClient.getItems(userId, from, size);
         log.info("Finish fetching items for user with id = {}", userId);

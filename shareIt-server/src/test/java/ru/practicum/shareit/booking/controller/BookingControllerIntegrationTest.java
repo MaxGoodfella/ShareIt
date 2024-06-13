@@ -46,7 +46,7 @@ class BookingControllerIntegrationTest {
     @MockBean
     private BookingService bookingService;
 
-    LocalDateTime created = LocalDateTime.now().withNano(0);
+    LocalDateTime created = LocalDateTime.now().withNano(4);
 
     private final User user =
             new User(1, "username", "user@email.com");
@@ -54,13 +54,13 @@ class BookingControllerIntegrationTest {
     private final Item item =
             new Item(1, "item name", "item description", true, user, null);
 
-    private final Booking booking = new Booking(1, created.plusDays(1), created.plusDays(2),
-            item, user, BookingState.WAITING, BookingTimeState.ALL);
+    private final Booking booking = new Booking(1, created.plusDays(1).withNano(4),
+            created.plusDays(2).withNano(4), item, user, BookingState.WAITING, BookingTimeState.ALL);
 
     private final BookingDto bookingDto = BookingDto.builder()
             .id(1)
-            .start(created.plusDays(1).withNano(0))
-            .end(created.plusDays(2).withNano(0))
+            .start(created.plusDays(1).withNano(4))
+            .end(created.plusDays(2).withNano(4))
             .itemId(item.getId())
             .status(BookingState.WAITING)
             .bookingTimeState(BookingTimeState.ALL)
@@ -81,8 +81,8 @@ class BookingControllerIntegrationTest {
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(booking.getId()), Integer.class))
-                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(0).toString())))
-                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(0).toString())))
+                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(4).toString())))
+                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(4).toString())))
                 .andExpect(jsonPath("$.item.id", is(item.getId())))
                 .andExpect(jsonPath("$.booker.id", is(user.getId())))
                 .andExpect(jsonPath("$.status", is(booking.getStatus().toString())))
@@ -104,8 +104,8 @@ class BookingControllerIntegrationTest {
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(booking.getId()), Integer.class))
-                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(0).toString())))
-                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(0).toString())))
+                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(4).toString())))
+                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(4).toString())))
                 .andExpect(jsonPath("$.item.id", is(item.getId())))
                 .andExpect(jsonPath("$.booker.id", is(user.getId())))
                 .andExpect(jsonPath("$.status", is(booking.getStatus().toString())))
@@ -123,8 +123,8 @@ class BookingControllerIntegrationTest {
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(booking.getId()), Integer.class))
-                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(0).toString())))
-                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(0).toString())))
+                .andExpect(jsonPath("$.start", is(booking.getStart().withNano(4).toString())))
+                .andExpect(jsonPath("$.end", is(booking.getEnd().withNano(4).toString())))
                 .andExpect(jsonPath("$.item.id", is(item.getId())))
                 .andExpect(jsonPath("$.booker.id", is(user.getId())))
                 .andExpect(jsonPath("$.status", is(booking.getStatus().toString())))
@@ -146,8 +146,8 @@ class BookingControllerIntegrationTest {
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(booking.getId()), Integer.class))
-                .andExpect(jsonPath("$.[0].start", is(booking.getStart().withNano(0).toString())))
-                .andExpect(jsonPath("$.[0].end", is(booking.getEnd().withNano(0).toString())))
+                .andExpect(jsonPath("$.[0].start", is(booking.getStart().withNano(4).toString())))
+                .andExpect(jsonPath("$.[0].end", is(booking.getEnd().withNano(4).toString())))
                 .andExpect(jsonPath("$.[0].item.id", is(item.getId())))
                 .andExpect(jsonPath("$.[0].booker.id", is(user.getId())))
                 .andExpect(jsonPath("$.[0].status", is(booking.getStatus().toString())))
@@ -169,8 +169,8 @@ class BookingControllerIntegrationTest {
 
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id", is(booking.getId()), Integer.class))
-                .andExpect(jsonPath("$.[0].start", is(booking.getStart().withNano(0).toString())))
-                .andExpect(jsonPath("$.[0].end", is(booking.getEnd().withNano(0).toString())))
+                .andExpect(jsonPath("$.[0].start", is(booking.getStart().withNano(4).toString())))
+                .andExpect(jsonPath("$.[0].end", is(booking.getEnd().withNano(4).toString())))
                 .andExpect(jsonPath("$.[0].item.id", is(item.getId())))
                 .andExpect(jsonPath("$.[0].booker.id", is(user.getId())))
                 .andExpect(jsonPath("$.[0].status", is(booking.getStatus().toString())))

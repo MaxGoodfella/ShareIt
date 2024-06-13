@@ -244,17 +244,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     void validateState(String state) {
-        if (!(state.equalsIgnoreCase("WAITING")
-                || state.equalsIgnoreCase("APPROVED")
-                || state.equalsIgnoreCase("REJECTED")
-                || state.equalsIgnoreCase("CANCELED")
-                || state.equalsIgnoreCase("ALL")
-                || state.equalsIgnoreCase("CURRENT")
-                || state.equalsIgnoreCase("PAST")
-                || state.equalsIgnoreCase("FUTURE")
-                || state.equalsIgnoreCase(""))) {
+
+        if (state.isEmpty()) {
+            return;
+        }
+
+        boolean isValid = false;
+
+        for (BookingState bookingState : BookingState.values()) {
+            if (bookingState.name().equalsIgnoreCase(state)) {
+                isValid = true;
+                break;
+            }
+        }
+
+        if (!isValid) {
+            for (BookingTimeState bookingTimeState : BookingTimeState.values()) {
+                if (bookingTimeState.name().equalsIgnoreCase(state)) {
+                    isValid = true;
+                    break;
+                }
+            }
+        }
+
+        if (!isValid) {
             throw new IllegalArgumentException("Unknown state: " + state);
         }
+
     }
 
 }

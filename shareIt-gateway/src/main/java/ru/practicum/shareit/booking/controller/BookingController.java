@@ -16,6 +16,8 @@ import ru.practicum.shareit.booking.BookingClient;
 import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 
 @RestController
@@ -61,9 +63,9 @@ public class BookingController {
     public ResponseEntity<Object> getBookingsSentByUserId(@RequestHeader(REQUEST_HEADER) Long userId,
                                                           @RequestParam(value = "state",
                                                                   defaultValue = "ALL") String state,
-                                                          @RequestParam(required = false,
+                                                          @PositiveOrZero @RequestParam(required = false,
                                                                   defaultValue = "0") Long from,
-                                                          @RequestParam(required = false,
+                                                          @Positive @RequestParam(required = false,
                                                                   defaultValue = "100") Long size) {
         log.info("Start fetching bookings with state '{}' from user with id = {}", state, userId);
         ResponseEntity<Object> response = bookingClient.getBookingsSent(userId, state.toUpperCase(), from, size);
@@ -75,9 +77,9 @@ public class BookingController {
     public ResponseEntity<Object> getBookingsReceivedByUserId(@RequestHeader(REQUEST_HEADER) Long userId,
                                                               @RequestParam(value = "state",
                                                                       defaultValue = "ALL") String state,
-                                                              @RequestParam(required = false,
+                                                              @PositiveOrZero @RequestParam(required = false,
                                                                       defaultValue = "0") Long from,
-                                                              @RequestParam(required = false,
+                                                              @Positive @RequestParam(required = false,
                                                                       defaultValue = "100") Long size) {
         log.info("Start fetching bookings with state '{}' for user with id = {}", state, userId);
         ResponseEntity<Object> response = bookingClient.getBookingsReceived(userId, state.toUpperCase(), from, size);

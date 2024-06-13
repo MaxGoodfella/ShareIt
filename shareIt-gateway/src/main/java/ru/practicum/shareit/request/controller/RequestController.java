@@ -15,6 +15,8 @@ import ru.practicum.shareit.request.RequestClient;
 import ru.practicum.shareit.request.dto.RequestDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 
 @RestController
@@ -55,8 +57,8 @@ public class RequestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getRequests(@RequestParam(required = false, defaultValue = "0") Long from,
-                                              @RequestParam(required = false, defaultValue = "100") Long size,
+    public ResponseEntity<Object> getRequests(@PositiveOrZero @RequestParam(required = false, defaultValue = "0") Long from,
+                                              @Positive @RequestParam(required = false, defaultValue = "100") Long size,
                                               @RequestHeader(REQUEST_HEADER) Long userId) {
         log.info("Start fetching requests using 'from' parameter = {} and 'size' parameter = {}", from, size);
         ResponseEntity<Object> response = requestClient.getRequests(userId, from, size);
