@@ -47,3 +47,4 @@ HELP*.class
 
     db/*.DS_Store
     *.DS_Store
+    */shareIt-server.DS_Store
